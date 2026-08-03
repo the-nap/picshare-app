@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,12 +15,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +36,6 @@ class LoginActivity : ComponentActivity() {
       PicshareTheme {
         Surface(
           modifier = Modifier.fillMaxSize(),
-          color = MaterialTheme.colorScheme.background
         ) {
           LoginScreen()
         }
@@ -45,8 +47,9 @@ class LoginActivity : ComponentActivity() {
 @Composable
 fun LoginScreen() {
   Box(
-    modifier = Modifier.fillMaxSize(),
-    contentAlignment = Alignment.Center
+    modifier = Modifier.fillMaxSize()
+      .background(MaterialTheme.colorScheme.background),
+    contentAlignment = Alignment.Center,
   ){
     LoginCard()
 
@@ -55,19 +58,26 @@ fun LoginScreen() {
 
 @Composable
 fun LoginCard() {
-  Column(
+  Card(
+    elevation = CardDefaults.cardElevation(
+      defaultElevation = 24.dp
+    ),
     modifier = Modifier
-      .fillMaxWidth()
-      .padding(24.dp),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    Image(
-      painter = painterResource(id = R.drawable.logo),
-      contentDescription = ""
+      .padding(16.dp),
+    shape = RoundedCornerShape(16.dp),
+    colors = CardDefaults.cardColors(
+      containerColor = MaterialTheme.colorScheme.surface
     )
-    Spacer(Modifier.height(48.dp))
+  ) {
+    Column(){
+      Image(
+        painter = painterResource(id = R.drawable.logo),
+        contentDescription = ""
+      )
+      Spacer(Modifier.height(48.dp))
 
-    LoginButtons()
+      LoginButtons()
+    }
   }
 }
 
@@ -76,8 +86,12 @@ fun LoginButtons(){
   Card(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(24.dp),
-    shape = RoundedCornerShape(16.dp)
+      .padding(16.dp)
+      .shadow(8.dp),
+    shape = RoundedCornerShape(16.dp),
+    colors = CardDefaults.cardColors(
+      containerColor = MaterialTheme.colorScheme.surfaceVariant
+    )
   ) {
     Column(
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,7 +106,7 @@ fun LoginButtons(){
 
 @Preview(showBackground = true)
 @Composable
-fun loginScreenPreview() {
+fun LoginScreenPreview() {
   PicshareTheme {
     LoginScreen()
   }
