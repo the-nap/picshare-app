@@ -9,9 +9,13 @@ lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 kotlin = "2.4.10"
 composeBom = "2026.06.01"
+security-crypto = "1.1.0"
+kotlinx-coroutines = "1.11.0"
 
 [libraries]
 appauth = { group = "net.openid", name = "appauth", version.ref = "appauth" }
+androidx-security = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
