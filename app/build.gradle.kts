@@ -37,6 +37,8 @@ android {
 
 dependencies {
     implementation(libs.appauth)
+    implementation(libs.kotlinx.coroutines)
+    implementation(libs.androidx.security)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

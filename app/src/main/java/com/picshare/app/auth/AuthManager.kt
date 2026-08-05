@@ -1,8 +1,12 @@
 package com.picshare.app.auth
 
+import android.content.Context
 import androidx.core.net.toUri
 import kotlinx.coroutines.suspendCancellableCoroutine
+import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationRequest
+import net.openid.appauth.AuthorizationResponse
+import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.ResponseTypeValues
 import kotlin.coroutines.resume
@@ -38,5 +42,33 @@ object AuthManager {
     )
       .setScope("openid email profile offline_access")
       .build()
+  }
+
+  fun exchangeCodeForTokens(response: AuthorizationResponse, authService: AuthorizationService, context: Context){
+    val tokenRequest = response.createTokenExchangeRequest()
+
+    authService.performTokenRequest(tokenRequest){ tokenResponse, ex ->
+      if(tokenResponse != null) {
+        val authState = AuthState(response, tokenResponse, null)
+        TokenStorage.save(context, authState)
+      }
+    }
+  }
+
+  fun callApi(context: Context, onToken: (String) -> Unit, onError: (Exception) -> Unit){
+    val authState = TokenStorage.load(context) ?: run {
+      onError(Exception("Not authenticated")); return
+    }
+    val authService = AuthorizationService(context)
+    authState.performActionWithFreshTokens(authService){ accessToken, _, ex ->
+      authService.dispose()
+      if(accessToken != null){
+        TokenStorage.save(context, authState)
+        onToken(accessToken)
+      } else {
+        TokenStorage.clear(context)
+        onError(ex ?: Exception("Token refresh failed"))
+      }
+    }
   }
 }
