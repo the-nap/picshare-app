@@ -1,6 +1,7 @@
 package com.picshare.app.auth
 
 import android.content.Context
+import android.util.Log
 import androidx.core.net.toUri
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.openid.appauth.AuthState
@@ -8,10 +9,10 @@ import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
+import net.openid.appauth.EndSessionRequest
 import net.openid.appauth.ResponseTypeValues
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 object AuthManager {
 
@@ -51,11 +52,13 @@ object AuthManager {
       if(tokenResponse != null) {
         val authState = AuthState(response, tokenResponse, null)
         TokenStorage.save(context, authState)
+      } else {
+        Log.e(context.toString(), ex?.message ?: "Error in exchanging tokens", ex)
       }
     }
   }
 
-  fun callApi(context: Context, onToken: (String) -> Unit, onError: (Exception) -> Unit){
+  fun refreshToken(context: Context, onToken: (String) -> Unit, onError: (Exception) -> Unit){
     val authState = TokenStorage.load(context) ?: run {
       onError(Exception("Not authenticated")); return
     }
@@ -70,5 +73,28 @@ object AuthManager {
         onError(ex ?: Exception("Token refresh failed"))
       }
     }
+  }
+
+  fun logout(context: Context){
+    val authState = TokenStorage.load(context) ?: return
+    val authService = AuthorizationService(context)
+
+    val serviceConfig = authState.authorizationServiceConfiguration
+    val idToken = authState.idToken
+
+    TokenStorage.clear(context)
+
+    if(serviceConfig != null && idToken != null){
+      val endSessionRequest = EndSessionRequest.Builder(serviceConfig)
+        .setIdTokenHint(idToken)
+        .setPostLogoutRedirectUri(
+          "com.picshare.app:/oauth2redirect".toUri()
+        )
+        .build()
+
+      val endSessionIntent = authService.getEndSessionRequestIntent(endSessionRequest)
+      context.startActivity(endSessionIntent)
+    }
+    authService.dispose()
   }
 }

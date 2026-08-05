@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.picshare.app.auth
 
 import android.content.Context

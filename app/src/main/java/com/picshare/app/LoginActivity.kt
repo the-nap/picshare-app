@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
 
 class LoginActivity : ComponentActivity() {
+  private val TAG: String? = LoginActivity::class.simpleName
   private lateinit var authService: AuthorizationService
 
   private val authLauncher = registerForActivityResult(
@@ -73,12 +74,14 @@ class LoginActivity : ComponentActivity() {
         val serviceConfig = AuthManager.discoverServiceConfig()
         val authRequest = AuthManager.buildAuthRequest(serviceConfig)
         val authIntent = authService.getAuthorizationRequestIntent(authRequest)
-      } catch (e: Exception) {}
+      } catch (e: Exception) {
+        Log.e(TAG, e.message ?: "Error during login")
+      }
     }
   }
 
   private fun handleAuthorizationResult(resultCode: Int, data: Intent?){
-    if (resultCode == Activity.RESULT_CANCELED || data == null){
+    if (resultCode == RESULT_CANCELED || data == null){
       return
     }
     val response = net.openid.appauth.AuthorizationResponse.fromIntent(data)
@@ -86,7 +89,7 @@ class LoginActivity : ComponentActivity() {
     if(response != null){
       AuthManager.exchangeCodeForTokens(response, authService, this)
     } else {
-      Log.e(LoginActivity::class.java.name, ex?.error!!)
+      Log.e(TAG, ex?.message ?: "Error during authorization")
     }
   }
 
