@@ -1,6 +1,8 @@
 package com.picshare.app.auth
 
+import android.app.Activity.RESULT_CANCELED
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.core.net.toUri
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -16,8 +18,8 @@ import kotlin.coroutines.resumeWithException
 
 object AuthManager {
 
-  private const val KEYCLOAK_BASE = ""
-  private const val REALM = "picshare"
+  private const val KEYCLOAK_BASE = "https://amoeba-immense-macaw.ngrok-free.app"
+  private const val REALM = "picshare-realm"
   private const val CLIENT_ID = "picshare-app"
   private const val REDIRECT_URI = "com.picshare.app:/oauth2redirect"
 
@@ -55,6 +57,19 @@ object AuthManager {
       } else {
         Log.e(context.toString(), ex?.message ?: "Error in exchanging tokens", ex)
       }
+    }
+  }
+
+  fun handleAuthorizationResult(resultCode: Int, data: Intent?, authService: AuthorizationService, context: Context) {
+    if (resultCode == RESULT_CANCELED || data == null) {
+      return
+    }
+    val response = net.openid.appauth.AuthorizationResponse.fromIntent(data)
+    val ex = net.openid.appauth.AuthorizationException.fromIntent(data)
+    if (response != null) {
+      AuthManager.exchangeCodeForTokens(response, authService, context)
+    } else {
+      Log.e(context.toString(), ex?.message ?: "Error during authorization")
     }
   }
 

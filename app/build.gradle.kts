@@ -11,6 +11,8 @@ android {
 
     defaultConfig {
         applicationId = "com.picshare.app"
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.picshare.app"
+
         minSdk = 26
         targetSdk = 37
         versionCode = 1
