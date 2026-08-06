@@ -1,5 +1,6 @@
-package com.picshare.app
+package com.picshare.app.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -36,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import com.picshare.app.R
 import com.picshare.app.auth.AuthManager
-import com.picshare.app.auth.AuthManager.handleAuthorizationResult
 import com.picshare.app.ui.theme.PicshareTheme
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthorizationService
@@ -49,7 +50,17 @@ class LoginActivity : ComponentActivity() {
   private val authLauncher = registerForActivityResult(
     ActivityResultContracts.StartActivityForResult()
   ) { result ->
-    handleAuthorizationResult(result.resultCode, result.data, authService = authService, this)
+    AuthManager.handleAuthorizationResult(
+      result.resultCode,
+      result.data,
+      authService = authService,
+      this
+    )
+    if(result.resultCode == RESULT_OK){
+      val intent = Intent(this, FeedActivity::class.java)
+      startActivity(intent)
+      finish()
+    }
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,7 +144,7 @@ class LoginActivity : ComponentActivity() {
         .fillMaxWidth()
         .padding(16.dp)
         .shadow(8.dp),
-      shape = RoundedCornerShape(16.dp),
+      shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
       colors = CardDefaults.cardColors(
         containerColor = MaterialTheme.colorScheme.surfaceVariant
       )
@@ -162,11 +173,11 @@ class LoginActivity : ComponentActivity() {
         .height(64.dp)
         .shadow(
           elevation = 8.dp,
-          shape = RoundedCornerShape(10.dp),
+          shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
           ambientColor = Color.Black.copy(alpha = 0.4f),
           spotColor = Color.Black.copy(alpha = 0.4f)
         ),
-      shape = RoundedCornerShape(10.dp),
+      shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
       colors = ButtonDefaults.buttonColors(
         containerColor = Color(0xFF63B3ED),
         contentColor = Color(0xFF1A1E27)

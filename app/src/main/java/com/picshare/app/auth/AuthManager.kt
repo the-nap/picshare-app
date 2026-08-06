@@ -67,7 +67,7 @@ object AuthManager {
     val response = net.openid.appauth.AuthorizationResponse.fromIntent(data)
     val ex = net.openid.appauth.AuthorizationException.fromIntent(data)
     if (response != null) {
-      AuthManager.exchangeCodeForTokens(response, authService, context)
+      exchangeCodeForTokens(response, authService, context)
     } else {
       Log.e(context.toString(), ex?.message ?: "Error during authorization")
     }

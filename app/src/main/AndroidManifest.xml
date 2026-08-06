@@ -18,41 +18,51 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Picshare"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"
             android:theme="@style/Theme.Picshare"
             android:windowSoftInputMode="adjustResize">
-          <intent-filter>
-              <action android:name="android.intent.action.MAIN" />
-              <category android:name="android.intent.category.LAUNCHER" />
-          </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name="net.openid.appauth.RedirectUriReceiverActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="${appAuthRedirectScheme}"
-                    android:host="oauth2redirect" />
+                    android:host="oauth2redirect"
+                    android:scheme="${appAuthRedirectScheme}" />
             </intent-filter>
             <!-- App Link (HTTPS) - optional but recommended for production -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="https"
                     android:host="your-package-name.app.link"
-                    android:path="/oauth2redirect" />
+                    android:path="/oauth2redirect"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
-      </application>
+        <activity
+            android:name=".ui.FeedActivity"
+            android:exported="false"
+            android:label="@string/title_activity_feed"
+            android:theme="@style/Theme.Picshare"
+            android:windowSoftInputMode="adjustResize" />
+    </application>
 
 </manifest>
