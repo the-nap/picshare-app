@@ -23,6 +23,7 @@ android {
 
     buildTypes {
         release {
+            buildConfigField("String", "API_URL", "\"https://amoeba-immense-macaw.ngrok-free.app/")
             optimization {
                 enable = false
             }
@@ -38,9 +39,14 @@ android {
 }
 
 dependencies {
+    implementation(libs.retrofit)
+    implementation(libs.gson.converter)
     implementation(libs.appauth)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.androidx.security)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.coil)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

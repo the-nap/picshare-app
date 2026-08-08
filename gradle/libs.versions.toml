@@ -11,11 +11,20 @@ kotlin = "2.4.10"
 composeBom = "2026.06.01"
 security-crypto = "1.1.0"
 kotlinx-coroutines = "1.11.0"
+compose = "1.12.0-rc01"
+coil = "3.5.0"
+retrofit = "3.0.0"
+gson-converter = "3.0.0"
 
 [libraries]
 appauth = { group = "net.openid", name = "appauth", version.ref = "appauth" }
 androidx-security = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+gson-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson-converter" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "compose" }
+coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
