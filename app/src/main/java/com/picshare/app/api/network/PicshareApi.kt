@@ -14,28 +14,28 @@ import retrofit2.http.Path
 interface PicshareApi {
 
   @GET("/post/{id}")
-  suspend fun getPost(@Path("id") id: String): Response<PostModel>
+  suspend fun getPost(@Path("id") id: String): PostModel
 
   @DELETE("/post/{id}/delete")
-  suspend fun deletePost(@Path("id") id: String): Response<Unit>
+  suspend fun deletePost(@Path("id") id: String): Unit
 
   @GET("/feed")
-  suspend fun getPostsByFeed(): Response<List<PostModel>>
+  suspend fun getPostsByFeed(): List<PostModel>
 
   @GET("/post/user/{id}")
-  suspend fun getPostsByUser(@Path("id") id: String): Response<List<PostModel>>
+  suspend fun getPostsByUser(@Path("id") id: String): List<PostModel>
 
   @GET("/post/tags/{tag}")
-  suspend fun getPostsByTag(@Path("tag") tag: String): Response<List<PostModel>>
+  suspend fun getPostsByTag(@Path("tag") tag: String): List<PostModel>
 
   @Multipart
   @POST("post/upload")
-  suspend fun uploadMedia(@Part data: MultipartBody.Part, @Part("metadata") metadata: RequestBody): Response<Unit>
+  suspend fun uploadMedia(@Part data: MultipartBody.Part, @Part("metadata") metadata: RequestBody)
 
   @POST("/post/{id}/like")
-  suspend fun like(@Path("id") id: String): Response<Unit>
+  suspend fun like(@Path("id") id: String)
 
   @GET("post/{id}/likes")
-  suspend fun isLiked(@Path("id") id: String): Response<Boolean>
+  suspend fun isLiked(@Path("id") id: String): Boolean
 
 }

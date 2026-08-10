@@ -1,8 +1,6 @@
 package com.picshare.app.post
 
 import com.google.gson.Gson
-import com.picshare.app.api.network.ApiResult
-import com.picshare.app.api.network.AppError
 import com.picshare.app.api.network.PicshareApi
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -15,23 +13,24 @@ class PostRepository(
   private val dataSource: PicshareApi
 ) {
 
-  suspend fun getPost(id: String): ApiResult<PostModel> {
+  suspend fun getPost(id: String): PostModel {
     return handleRequest {
       dataSource.getPost(id)
     }
   }
 
-  suspend fun getPosts(toSearch: String, requestType: RequestType): ApiResult<List<PostModel>>{
+  suspend fun getPosts(toSearch: String, key: String): List<PostModel>{
     return handleRequest {
-      when(requestType){
-        RequestType.TAG -> dataSource.getPostsByTag(toSearch)
-        RequestType.FEED -> dataSource.getPostsByFeed()
-        RequestType.USER -> dataSource.getPostsByUser(toSearch)
+      when(key){
+        "tag" -> dataSource.getPostsByTag(toSearch)
+        "feed" -> dataSource.getPostsByFeed()
+        "user" -> dataSource.getPostsByUser(toSearch)
+        else -> throw IllegalArgumentException("Unknown key: $key")
       }
     }
   }
 
-  suspend fun upload(media: ImageUploadModel): ApiResult<Unit>{
+  suspend fun upload(media: ImageUploadModel){
     val filePart = MultipartBody.Part.createFormData(
       name = "data",
       filename = media.file.name,
@@ -45,53 +44,25 @@ class PostRepository(
     }
   }
 
-  suspend fun delete(id: String): ApiResult<Unit>{
+  suspend fun delete(id: String){
     return handleRequest {
       dataSource.deletePost(id)
     }
   }
 
-  suspend fun like(id: String): ApiResult<Unit>{
+  suspend fun like(id: String){
     return handleRequest {
       dataSource.like(id)
     }
   }
 
-  suspend fun likes(id: String): ApiResult<Boolean>{
+  suspend fun likes(id: String): Boolean{
     return handleRequest {
       dataSource.isLiked(id)
     }
   }
 
-  suspend fun <T> handleRequest(request: suspend () -> Response<T>): ApiResult<T> {
-    return try {
-      val response = request()
-      if (response.isSuccessful) {
-        val body = response.body()
-        if (body != null) {
-          ApiResult.Success(body)
-        } else {
-          ApiResult.Failure(AppError.EmptyBody)
-        }
-      } else {
-        ApiResult.Failure(
-          AppError.Http(
-            code = response.code(),
-            message = response.errorBody()?.string() ?: response.message()
-          )
-        )
-      }
-    } catch (e: java.net.SocketTimeoutException) {
-      ApiResult.Failure(AppError.Timeout)
-    } catch (e: java.io.IOException) {
-      ApiResult.Failure(AppError.Network)
-    } catch (t: Throwable) {
-      ApiResult.Failure(AppError.Unknown(t))
-    }
+  suspend fun <T> handleRequest(request: suspend () -> T): T {
+    return request()
   }
-
-  enum class RequestType{
-    TAG, USER, FEED
-  }
-
 }
