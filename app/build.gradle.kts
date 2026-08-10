@@ -22,8 +22,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "API_URL",
+                "\"https://amoeba-immense-macaw.ngrok-free.app/\""
+            )
+        }
         release {
-            buildConfigField("String", "API_URL", "\"https://amoeba-immense-macaw.ngrok-free.app/")
+            buildConfigField("String", "API_URL", "\"https://amoeba-immense-macaw.ngrok-free.app/\"")
             optimization {
                 enable = false
             }
@@ -35,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
