@@ -127,7 +127,7 @@ class LoginActivity : ComponentActivity() {
     ) {
       Column() {
         Image(
-          painter = painterResource(id = R.drawable.logo),
+          painter = painterResource(id = R.drawable.logo_complete),
           contentDescription = ""
         )
         Spacer(Modifier.height(48.dp))
