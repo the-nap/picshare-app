@@ -15,6 +15,8 @@ compose = "1.12.0-rc01"
 coil = "3.5.0"
 retrofit = "3.0.0"
 gson-converter = "3.0.0"
+hilt = "2.60.1"
+ksp = "2.3.11"
 
 [libraries]
 appauth = { group = "net.openid", name = "appauth", version.ref = "appauth" }
@@ -24,6 +26,8 @@ gson-converter = { group = "com.squareup.retrofit2", name = "converter-gson", ve
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "compose" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -43,4 +47,5 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
