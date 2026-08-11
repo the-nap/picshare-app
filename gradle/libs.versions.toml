@@ -17,8 +17,11 @@ retrofit = "3.0.0"
 gson-converter = "3.0.0"
 hilt = "2.60.1"
 ksp = "2.3.11"
+navigation = "2.9.8"
+serialization = "2.4.10"
 
 [libraries]
+navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 appauth = { group = "net.openid", name = "appauth", version.ref = "appauth" }
 androidx-security = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -49,3 +52,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
