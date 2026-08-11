@@ -3,6 +3,7 @@ package com.picshare.app.navigation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,7 +36,8 @@ fun NavigationFooter(
             restoreState = true
           }
         },
-        icon = { Icon(imageVector = destination.icon, contentDescription = null) }
+        icon = { Icon(imageVector = destination.icon, contentDescription = null) },
+        label = { Text(destination.label) }
       )
     }
   }
