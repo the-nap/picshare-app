@@ -1,5 +1,9 @@
 package com.picshare.app.ui.user
 
-fun UserScreen() {
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 
+@Composable
+fun UserScreen() {
+  Text("Il tuo profilo")
 }
