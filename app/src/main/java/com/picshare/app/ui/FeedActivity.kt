@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.picshare.app.ui.theme.PicshareTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FeedActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
