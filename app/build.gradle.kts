@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.coil)
     implementation(libs.navigation)
+    implementation(libs.composeIcons.cssGg)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

@@ -19,8 +19,10 @@ hilt = "2.60.1"
 ksp = "2.3.11"
 navigation = "2.9.8"
 serialization = "2.4.10"
+composeIcons = "1.1.1"
 
 [libraries]
+composeIcons-cssGg = { module = "br.com.devsrsouza.compose.icons:css-gg", version.ref = "composeIcons" }
 navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 appauth = { group = "net.openid", name = "appauth", version.ref = "appauth" }
 androidx-security = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }

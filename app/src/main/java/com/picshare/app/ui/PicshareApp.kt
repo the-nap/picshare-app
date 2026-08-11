@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.picshare.app.navigation.AppNavHost
+import com.picshare.app.navigation.NavigationFooter
 import com.picshare.app.ui.theme.PicshareTheme
 
 @Composable
@@ -14,7 +15,8 @@ fun PicshareApp(){
   PicshareTheme {
     Scaffold(
       topBar = { Header() },
-      modifier = Modifier.fillMaxSize()
+      modifier = Modifier.fillMaxSize(),
+      bottomBar = { NavigationFooter(navController) }
     ) { innerPadding ->
       AppNavHost(navController, innerPadding)
     }
