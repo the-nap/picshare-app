@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Picshare">
         <activity
-            android:name=".ui.FeedActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:label="@string/title_activity_feed"
             android:theme="@style/Theme.Picshare"

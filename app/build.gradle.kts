@@ -26,14 +26,16 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField(
-                "String",
-                "API_URL",
-                "\"https://amoeba-immense-macaw.ngrok-free.app/\""
-            )
+            buildConfigField("String", "API_URL", "\"https://amoeba-immense-macaw.ngrok-free.app/\"")
+            buildConfigField("String", "REALM", "\"picshare-realm\"")
+            buildConfigField("String", "CLIENT_ID", "\"picshare-app\"")
+            buildConfigField("String", "REDIRECT_URI", "\"com.picshare.app:/oauth2redirec\"")
         }
         release {
             buildConfigField("String", "API_URL", "\"https://amoeba-immense-macaw.ngrok-free.app/\"")
+            buildConfigField("String", "REALM", "\"picshare-realm\"")
+            buildConfigField("String", "CLIENT_ID", "\"picshare-app\"")
+            buildConfigField("String", "REDIRECT_URI", "\"com.picshare.app:/oauth2redirec\"")
             optimization {
                 enable = false
             }

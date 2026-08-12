@@ -26,6 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -37,36 +41,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import com.picshare.app.ui.MainActivity
 import com.picshare.app.R
-import com.picshare.app.auth.AuthManager
+import com.picshare.app.auth.AuthRepository
 import com.picshare.app.ui.theme.PicshareTheme
 import kotlinx.coroutines.launch
-import net.openid.appauth.AuthorizationService
+import javax.inject.Inject
 
 class LoginActivity : ComponentActivity() {
   private val TAG: String? = LoginActivity::class.simpleName
-  private lateinit var authService: AuthorizationService
+  @Inject
+  lateinit var authRepository: AuthRepository
 
   private val authLauncher = registerForActivityResult(
     ActivityResultContracts.StartActivityForResult()
   ) { result ->
-    AuthManager.handleAuthorizationResult(
-      result.resultCode,
-      result.data,
-      authService = authService,
-      this
-    )
-    if(result.resultCode == RESULT_OK){
-      val intent = Intent(this, FeedActivity::class.java)
-      startActivity(intent)
-      finish()
+    lifecycleScope.launch {
+      try{
+        authRepository.handleAuthResponse(result.data)
+        goToMainActivity()
+      } catch(e: Exception){
+        Log.e(TAG, e.message ?: "Error")
+      }
     }
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    if(authRepository.currentUserId != null) {
+      goToMainActivity()
+      return
+    }
 
-    authService = AuthorizationService(this)
+
 
     enableEdgeToEdge()
     setContent {
@@ -80,18 +87,19 @@ class LoginActivity : ComponentActivity() {
     }
   }
 
+  private fun goToMainActivity(){
+    startActivity(Intent(this, MainActivity::class.java))
+    finish()
+  }
+
   override fun onDestroy() {
     super.onDestroy()
-    authService.dispose()
   }
 
   private fun startLogin() {
     lifecycleScope.launch {
       try {
-        val serviceConfig = AuthManager.discoverServiceConfig()
-        val authRequest = AuthManager.buildAuthRequest(serviceConfig)
-        val authIntent = authService.getAuthorizationRequestIntent(authRequest)
-        authLauncher.launch(authIntent)
+        authLauncher.launch(authRepository.getAuthorizationRequest())
       } catch (e: Exception) {
         Log.e(TAG, e.message ?: "Error during login")
       }
@@ -108,7 +116,6 @@ class LoginActivity : ComponentActivity() {
       contentAlignment = Alignment.Center,
     ) {
       LoginCard()
-
     }
   }
 

@@ -13,7 +13,7 @@ object TokenStorage {
   private const val FILE_NAME = "picshare_auth_state"
   private const val KEY_AUTH_STATE = "auth_state_json"
 
-  //TODO replace deprecated EncryptedSharedPreferences
+  //TODO("replace deprecated EncryptedSharedPreferences")
   private fun getPreferences(context: Context) =
     EncryptedSharedPreferences.create(
       context,
