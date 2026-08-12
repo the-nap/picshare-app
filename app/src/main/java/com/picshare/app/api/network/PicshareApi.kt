@@ -4,7 +4,6 @@ import com.picshare.app.post.PostModel
 import com.picshare.app.user.UserModel
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET

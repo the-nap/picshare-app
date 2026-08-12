@@ -1,11 +1,9 @@
 package com.picshare.app.di
 
-import android.app.Application
 import com.picshare.app.BuildConfig
 import com.picshare.app.api.network.PicshareApi
 import com.picshare.app.auth.AuthInterceptor
 import com.picshare.app.auth.AuthRepository
-import com.picshare.app.auth.AuthRepositoryImpl
 import com.picshare.app.post.PostRepository
 import dagger.Module
 import dagger.Provides
@@ -32,8 +30,9 @@ object AppModule {
       .create(PicshareApi::class.java)
   }
 
+  @Provides
   @Singleton
-  private fun getClientWithInterceptors(authRepository: AuthRepository): OkHttpClient{
+  fun getClientWithInterceptors(authRepository: AuthRepository): OkHttpClient{
     return OkHttpClient.Builder()
       .addInterceptor(AuthInterceptor({
         runBlocking{
