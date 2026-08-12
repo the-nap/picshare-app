@@ -2,6 +2,7 @@ package com.picshare.app.post
 
 import com.google.gson.Gson
 import com.picshare.app.api.network.PicshareApi
+import com.picshare.app.api.network.Util.handleRequest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -19,6 +20,7 @@ class PostRepository(
     }
   }
 
+  //TODO("add repeated requests for pagination")
   suspend fun getPosts(toSearch: String, key: String): List<PostModel>{
     return handleRequest {
       when(key){
@@ -62,7 +64,4 @@ class PostRepository(
     }
   }
 
-  suspend fun <T> handleRequest(request: suspend () -> T): T {
-    return request()
-  }
 }
