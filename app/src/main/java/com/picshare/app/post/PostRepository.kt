@@ -9,7 +9,8 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class PostRepository(
-  private val dataSource: PicshareApi
+  private val dataSource: PicshareApi,
+  private val gson: Gson
 ) {
 
   suspend fun getPost(id: String): PostModel {
@@ -36,7 +37,7 @@ class PostRepository(
       body = media.file.asRequestBody("application/octet-stream".toMediaType())
     )
 
-    val metadataJson = Gson().toJson(media.post)
+    val metadataJson = gson.toJson(media.post)
     val metadataPart = metadataJson.toRequestBody("application/json; charset=utf-8".toMediaType())
     return handleRequest {
       dataSource.uploadMedia(filePart, metadataPart)
@@ -55,7 +56,7 @@ class PostRepository(
     }
   }
 
-  suspend fun likes(id: String): Boolean{
+  suspend fun isLiked(id: String): Boolean{
     return handleRequest {
       dataSource.isLiked(id)
     }

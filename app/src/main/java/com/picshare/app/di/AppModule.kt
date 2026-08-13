@@ -1,5 +1,6 @@
 package com.picshare.app.di
 
+import com.google.gson.Gson
 import com.picshare.app.BuildConfig
 import com.picshare.app.api.network.PicshareApi
 import com.picshare.app.auth.AuthInterceptor
@@ -21,11 +22,11 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun provideApi(client: OkHttpClient): PicshareApi {
+  fun provideApi(client: OkHttpClient, gson: Gson): PicshareApi {
     return Retrofit.Builder()
       .baseUrl(BuildConfig.API_URL)
       .client(client)
-      .addConverterFactory(GsonConverterFactory.create())
+      .addConverterFactory(GsonConverterFactory.create(gson))
       .build()
       .create(PicshareApi::class.java)
   }
@@ -44,7 +45,13 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun providePostRepository(api: PicshareApi): PostRepository {
-    return PostRepository(api)
+  fun providePostRepository(api: PicshareApi, gson: Gson): PostRepository {
+    return PostRepository(api, gson)
+  }
+
+  @Provides
+  @Singleton
+  fun provideGson(): Gson{
+    return Gson()
   }
 }
