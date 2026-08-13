@@ -22,13 +22,13 @@ interface PicshareApi {
   suspend fun deletePost(@Path("id") id: String): Unit
 
   @GET("/feed")
-  suspend fun getPostsByFeed(): List<PostModel>
+  suspend fun getPostsByFeed(@Query("max") max: Int, @Query("offset") offset: Int): List<PostModel>
 
   @GET("/post/user/{id}")
-  suspend fun getPostsByUser(@Path("id") id: String): List<PostModel>
+  suspend fun getPostsByUser(@Path("id") id: String, @Query("max") max: Int, @Query("offset")offset: Int): List<PostModel>
 
   @GET("/post/tags/{tag}")
-  suspend fun getPostsByTag(@Path("tag") tag: String): List<PostModel>
+  suspend fun getPostsByTag(@Path("tag") tag: String, @Query("max") max: Int, @Query("offset")offset: Int): List<PostModel>
 
   @Multipart
   @POST("post/upload")

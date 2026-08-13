@@ -18,13 +18,12 @@ class PostRepository(
     }
   }
 
-  //TODO("add repeated requests for pagination")
-  suspend fun getPosts(toSearch: String, key: String): List<PostModel>{
+  suspend fun getPosts(key: String, toSearch: String? = null, max: Int = 24, offset: Int = 0): List<PostModel>{
     return handleRequest {
       when(key){
-        "tag" -> dataSource.getPostsByTag(toSearch)
-        "feed" -> dataSource.getPostsByFeed()
-        "user" -> dataSource.getPostsByUser(toSearch)
+        "tag" -> dataSource.getPostsByTag(toSearch!!, max, offset)
+        "feed" -> dataSource.getPostsByFeed(max, offset)
+        "user" -> dataSource.getPostsByUser(toSearch!!, max, offset)
         else -> throw IllegalArgumentException("Unknown key: $key")
       }
     }
