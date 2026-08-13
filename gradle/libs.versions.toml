@@ -8,10 +8,10 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 kotlin = "2.4.10"
-composeBom = "2026.06.01"
+composeBom = "2026.08.00"
 security-crypto = "1.1.0"
 kotlinx-coroutines = "1.11.0"
-compose = "1.12.0-rc01"
+compose = "1.12.0"
 coil = "3.5.0"
 retrofit = "3.0.0"
 gson-converter = "3.0.0"
@@ -20,6 +20,7 @@ ksp = "2.3.11"
 navigation = "2.9.8"
 serialization = "2.4.10"
 composeIcons = "1.1.1"
+hiltNavigationCompose = "1.4.0"
 
 [libraries]
 composeIcons-cssGg = { module = "br.com.devsrsouza.compose.icons:css-gg", version.ref = "composeIcons" }
@@ -33,6 +34,7 @@ androidx-compose-foundation-layout = { group = "androidx.compose.foundation", na
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
