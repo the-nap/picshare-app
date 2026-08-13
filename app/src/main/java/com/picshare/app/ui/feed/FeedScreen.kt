@@ -1,9 +1,13 @@
 package com.picshare.app.ui.feed
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.picshare.app.post.Gallery
+import com.picshare.app.post.GalleryViewModel
 
 @Composable
-fun FeedScreen(){
-Text("Il tuo feed")
+fun FeedScreen(
+  viewModel: GalleryViewModel
+){
+
+  Gallery(viewModel)
 }

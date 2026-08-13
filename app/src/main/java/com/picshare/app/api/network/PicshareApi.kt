@@ -19,7 +19,7 @@ interface PicshareApi {
   suspend fun getPost(@Path("id") id: String): PostModel
 
   @DELETE("/post/{id}/delete")
-  suspend fun deletePost(@Path("id") id: String): Unit
+  suspend fun deletePost(@Path("id") id: String)
 
   @GET("/feed")
   suspend fun getPostsByFeed(@Query("max") max: Int, @Query("offset") offset: Int): List<PostModel>
