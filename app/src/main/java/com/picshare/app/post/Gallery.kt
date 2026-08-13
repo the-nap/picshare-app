@@ -1,5 +1,6 @@
 package com.picshare.app.post
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -26,6 +27,7 @@ fun Gallery (
   galleryViewModel: GalleryViewModel = viewModel()
 ) {
 
+  val context = LocalContext.current
   val gridState = rememberLazyStaggeredGridState()
 
   LaunchedEffect(gridState) {
@@ -36,6 +38,12 @@ fun Gallery (
         lastVisibleIndex >= galleryViewModel.posts.size -5){
           galleryViewModel.loadNextPage()
       }
+    }
+  }
+
+  LaunchedEffect(Unit) {
+    galleryViewModel.errorEvents.collect { message ->
+      Toast.makeText(context, message, Toast.LENGTH_SHORT)
     }
   }
 
@@ -54,7 +62,7 @@ fun Gallery (
       content = {
         items(galleryViewModel.posts) { post ->
           AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
+            model = ImageRequest.Builder(context)
               .data("${BuildConfig.API_URL}/post/preview/$post.id")
               .crossfade(true),
             contentScale = ContentScale.Crop,
