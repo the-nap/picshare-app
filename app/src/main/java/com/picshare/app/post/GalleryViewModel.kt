@@ -21,8 +21,8 @@ class GalleryViewModel @Inject constructor (
   savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-  private val key: String = savedStateHandle.get<String>("key") ?: "feed"
-  private val toSearch: String? = savedStateHandle.get<String>("toSearch")
+  private val key: String? = savedStateHandle.get<String>("key")
+  private var toSearch: String? = savedStateHandle.get<String>("toSearch")
 
   private var offset = 0
   private val max = 12
@@ -45,7 +45,7 @@ class GalleryViewModel @Inject constructor (
     posts.isEmpty()
 
   fun loadNextPage() {
-    if(isLoading || !hasMore)
+    if(isLoading || !hasMore || key.isNullOrEmpty())
       return
     viewModelScope.launch {
       isLoading = true
