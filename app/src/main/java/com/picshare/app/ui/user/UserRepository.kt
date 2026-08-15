@@ -1,5 +1,6 @@
 package com.picshare.app.ui.user
 
+import com.google.gson.Gson
 import com.picshare.app.api.network.PicshareApi
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.api.network.Util.handleRequest
@@ -9,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 
 class UserRepository (
   private val dataSource: PicshareApi,
+  private val gson: Gson,
   private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ){
 

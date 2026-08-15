@@ -6,6 +6,7 @@ import com.picshare.app.api.network.PicshareApi
 import com.picshare.app.auth.AuthInterceptor
 import com.picshare.app.auth.AuthRepository
 import com.picshare.app.post.PostRepository
+import com.picshare.app.ui.user.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,6 +48,12 @@ object AppModule {
   @Singleton
   fun providePostRepository(api: PicshareApi, gson: Gson): PostRepository {
     return PostRepository(api, gson)
+  }
+
+  @Provides
+  @Singleton
+  fun provideUserRepository(api: PicshareApi, gson: Gson): UserRepository {
+    return UserRepository(api, gson)
   }
 
   @Provides
