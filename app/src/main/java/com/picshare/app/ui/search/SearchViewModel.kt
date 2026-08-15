@@ -10,6 +10,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -28,15 +29,24 @@ class SearchViewModel @Inject constructor (
   private val _query = MutableStateFlow<String>("")
   val query = _query.asStateFlow()
 
+  private val _searchType = MutableStateFlow<SearchType>(SearchType.USERS)
+  val searchType = _searchType.asStateFlow()
+
   init {
     viewModelScope.launch {
-      _query
+      combine(
+        _query,
+        _searchType
+      ){ query, type ->
+        query to type
+      }
         .debounce(300.milliseconds)
         .distinctUntilChanged()
-        .filter{ it.length > 3 }
-        .collectLatest { searchQuery ->
-          search(searchQuery)
+        .filter{ (query, _) -> query.length > 3 }
+        .collectLatest { (query, type) ->
+          search(query, type)
         }
+
     }
   }
 
@@ -44,7 +54,20 @@ class SearchViewModel @Inject constructor (
     _query.value = value
   }
 
-  fun search(query: String){
+  fun changeType(type: SearchType){
+    _searchType.value = type
+  }
+
+  fun search(query: String, type: SearchType){
+    when(type) {
+      SearchType.USERS -> {}
+      SearchType.TAGS -> {}
+    }
 
   }
+}
+
+enum class SearchType {
+  USERS,
+  TAGS
 }
