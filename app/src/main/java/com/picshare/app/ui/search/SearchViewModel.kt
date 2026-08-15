@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -26,38 +27,28 @@ class SearchViewModel @Inject constructor (
   savedStateHandle: SavedStateHandle
 ): ViewModel(){
 
-  private val _query = MutableStateFlow<String>("")
-  val query = _query.asStateFlow()
-
-  private val _searchType = MutableStateFlow<SearchType>(SearchType.USERS)
-  val searchType = _searchType.asStateFlow()
+  private val _uiState = MutableStateFlow(SearchUiState())
+  private val uiState = _uiState.asStateFlow()
 
   init {
     viewModelScope.launch {
-      combine(
-        _query,
-        _searchType
-      ){ query, type ->
-        query to type
-      }
+      val query = uiState
+        .map {it.toSearch}
         .debounce(300.milliseconds)
         .distinctUntilChanged()
-        .filter{ (query, _) -> query.length > 3 }
-        .collectLatest { (query, type) ->
-          search(query, type)
-        }
 
+      val type = uiState
+        .map{ it.searchType }
+        .distinctUntilChanged()
+
+      combine(query, type) {query, type ->
+        query to type
+      }.collect { (query, type) ->
+        if(query.length > 2)
+          search(query, type)
+      }
     }
   }
-
-  fun onQueryChange(value: String){
-    _query.value = value
-  }
-
-  fun changeType(type: SearchType){
-    _searchType.value = type
-  }
-
   fun search(query: String, type: SearchType){
     when(type) {
       SearchType.USERS -> {}
@@ -65,9 +56,4 @@ class SearchViewModel @Inject constructor (
     }
 
   }
-}
-
-enum class SearchType {
-  USERS,
-  TAGS
 }
