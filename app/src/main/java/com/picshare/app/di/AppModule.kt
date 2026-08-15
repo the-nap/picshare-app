@@ -3,10 +3,10 @@ package com.picshare.app.di
 import com.google.gson.Gson
 import com.picshare.app.BuildConfig
 import com.picshare.app.api.network.PicshareApi
-import com.picshare.app.auth.AuthInterceptor
-import com.picshare.app.auth.AuthRepository
-import com.picshare.app.post.PostRepository
-import com.picshare.app.ui.user.UserRepository
+import com.picshare.app.api.auth.AuthInterceptor
+import com.picshare.app.api.auth.AuthRepository
+import com.picshare.app.data.repository.PostRepository
+import com.picshare.app.data.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

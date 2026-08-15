@@ -1,4 +1,4 @@
-package com.picshare.app.navigation
+package com.picshare.app.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding

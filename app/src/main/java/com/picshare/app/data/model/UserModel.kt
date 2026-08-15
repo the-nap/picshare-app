@@ -1,4 +1,4 @@
-package com.picshare.app.user
+package com.picshare.app.data.model
 
 data class UserModel(
   val id: String,

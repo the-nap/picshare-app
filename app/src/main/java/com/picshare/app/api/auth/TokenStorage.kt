@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.picshare.app.auth
+package com.picshare.app.api.auth
 
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences

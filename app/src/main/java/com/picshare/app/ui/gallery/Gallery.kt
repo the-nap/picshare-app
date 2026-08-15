@@ -1,4 +1,4 @@
-package com.picshare.app.post
+package com.picshare.app.ui.gallery
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement

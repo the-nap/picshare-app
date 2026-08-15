@@ -1,7 +1,7 @@
 package com.picshare.app.api.network
 
-import com.picshare.app.post.PostModel
-import com.picshare.app.user.UserModel
+import com.picshare.app.data.model.PostModel
+import com.picshare.app.data.model.UserModel
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body

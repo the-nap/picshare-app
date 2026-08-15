@@ -1,4 +1,4 @@
-package com.picshare.app.navigation
+package com.picshare.app.ui.navigation
 
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.picshare.app.post
+package com.picshare.app.data.model
 
 import java.io.File
 

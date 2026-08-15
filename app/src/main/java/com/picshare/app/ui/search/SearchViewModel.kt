@@ -3,8 +3,8 @@ package com.picshare.app.ui.search
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.picshare.app.post.PostRepository
-import com.picshare.app.ui.user.UserRepository
+import com.picshare.app.data.repository.PostRepository
+import com.picshare.app.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

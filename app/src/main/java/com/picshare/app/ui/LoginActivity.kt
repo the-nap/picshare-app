@@ -37,8 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import com.picshare.app.MainActivity
 import com.picshare.app.R
-import com.picshare.app.auth.AuthRepository
+import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.ui.theme.PicshareTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

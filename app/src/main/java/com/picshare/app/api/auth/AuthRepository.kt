@@ -1,4 +1,4 @@
-package com.picshare.app.auth
+package com.picshare.app.api.auth
 
 import android.content.Intent
 
