@@ -40,9 +40,11 @@ import androidx.lifecycle.lifecycleScope
 import com.picshare.app.R
 import com.picshare.app.auth.AuthRepository
 import com.picshare.app.ui.theme.PicshareTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
   private val TAG: String? = LoginActivity::class.simpleName
   @Inject
@@ -56,7 +58,7 @@ class LoginActivity : ComponentActivity() {
         authRepository.handleAuthResponse(result.data)
         goToMainActivity()
       } catch(e: Exception){
-        Log.e(TAG, e.message ?: "Error")
+        Log.e(TAG, "Error in authLauncher()", e)
       }
     }
   }
@@ -67,9 +69,6 @@ class LoginActivity : ComponentActivity() {
       goToMainActivity()
       return
     }
-
-
-
     enableEdgeToEdge()
     setContent {
       PicshareTheme {
@@ -83,12 +82,10 @@ class LoginActivity : ComponentActivity() {
   }
 
   private fun goToMainActivity(){
+    Log.d(TAG, "Going to Main Activity")
     startActivity(Intent(this, MainActivity::class.java))
+    Log.d(TAG, "Main Activity started")
     finish()
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
   }
 
   private fun startLogin() {
@@ -96,7 +93,7 @@ class LoginActivity : ComponentActivity() {
       try {
         authLauncher.launch(authRepository.getAuthorizationRequest())
       } catch (e: Exception) {
-        Log.e(TAG, e.message ?: "Error during login")
+        Log.e(TAG, "Error in startLogin()", e)
       }
     }
   }

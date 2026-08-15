@@ -23,7 +23,7 @@ class AuthRepositoryImpl @Inject constructor(
   private val appContext: Application
 ) : AuthRepository {
 
-  private val issuerUri = "${BuildConfig.API_URL}/realms/${BuildConfig.REALM}".toUri()
+  private val issuerUri = "${BuildConfig.AUTH_URL}/realms/${BuildConfig.REALM}".toUri()
 
   override var currentUserId: String? = null
 
