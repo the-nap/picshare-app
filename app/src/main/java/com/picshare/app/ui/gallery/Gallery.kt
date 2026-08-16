@@ -2,6 +2,7 @@ package com.picshare.app.ui.gallery
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -21,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -29,9 +30,9 @@ import com.picshare.app.BuildConfig
 
 @Composable
 fun Gallery (
-  viewModel: GalleryViewModel = viewModel(),
-  key: String,
-  toSearch: String
+  viewModel: GalleryViewModel = hiltViewModel(),
+  key: String? = null,
+  toSearch: String? = null
 ) {
 
   val context = LocalContext.current
@@ -42,6 +43,7 @@ fun Gallery (
   LaunchedEffect(key, toSearch) {
     viewModel.initialize(key, toSearch)
   }
+
   LaunchedEffect(gridState) {
     snapshotFlow {
       gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
@@ -72,11 +74,12 @@ fun Gallery (
         columns = StaggeredGridCells.Fixed(2),
         verticalItemSpacing = 4.dp,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.fillMaxSize(),
         content = {
           items(state.posts) { post ->
             AsyncImage(
               model = ImageRequest.Builder(context)
-                .data("${BuildConfig.API_URL}/post/preview/${post.id}")
+                .data("${BuildConfig.PREVIEW_URL}/${post.id}")
                 .crossfade(true)
                 .build(),
               contentScale = ContentScale.Crop,

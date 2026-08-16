@@ -9,7 +9,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.picshare.app.ui.theme.PicshareTheme
+import com.picshare.app.ui.gallery.Gallery
 
 @Composable
 fun SearchScreen(
@@ -27,8 +26,9 @@ fun SearchScreen(
   val state = viewModel.uiState.collectAsState()
 
   SearchContent(
-    query = state.value.toSearch,
+    query = state.value.query,
     searchType = state.value.searchType,
+    typedText = state.value.typedText,
     onQueryChange = viewModel::onQueryChange,
     onTabChange = viewModel::onTabChange
   )
@@ -38,6 +38,7 @@ fun SearchScreen(
 fun SearchContent(
   query: String,
   searchType: SearchType,
+  typedText: String,
   onQueryChange: (String) -> Unit,
   onTabChange: (SearchType) -> Unit,
 ) {
@@ -50,7 +51,7 @@ fun SearchContent(
 
   ) {
     OutlinedTextField(
-      value = query,
+      value = typedText,
       onValueChange = onQueryChange,
       modifier = Modifier.fillMaxWidth(),
       singleLine = true,
@@ -102,15 +103,21 @@ fun SearchContent(
         }
       )
     }
+
+    when(searchType){
+      SearchType.USERS -> {}
+      SearchType.TAGS -> Gallery(key = "tag", toSearch = query)
+    }
   }
 }
 
 @Preview()
 @Composable
-fun SearchPreview(){
+fun SearchPreview() {
   SearchContent(
-    query = "Search text",
-    searchType = SearchType.USERS,
+    query = "",
+    searchType = SearchType.TAGS,
+    typedText = "",
     onQueryChange = {},
     onTabChange = {}
   )

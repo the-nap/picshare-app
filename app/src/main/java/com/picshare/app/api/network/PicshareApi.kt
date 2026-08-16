@@ -15,53 +15,53 @@ import retrofit2.http.Query
 
 interface PicshareApi {
 
-  @GET("/post/{id}")
+  @GET("post/{id}")
   suspend fun getPost(@Path("id") id: String): PostModel
 
-  @DELETE("/post/{id}/delete")
+  @DELETE("post/{id}/delete")
   suspend fun deletePost(@Path("id") id: String)
 
-  @GET("/feed")
+  @GET("feed")
   suspend fun getPostsByFeed(@Query("max") max: Int, @Query("offset") offset: Int): List<PostModel>
 
-  @GET("/post/user/{id}")
+  @GET("post/user/{id}")
   suspend fun getPostsByUser(@Path("id") id: String, @Query("max") max: Int, @Query("offset")offset: Int): List<PostModel>
 
-  @GET("/post/tags/{tag}")
+  @GET("post/tags/{tag}")
   suspend fun getPostsByTag(@Path("tag") tag: String, @Query("max") max: Int, @Query("offset")offset: Int): List<PostModel>
 
   @Multipart
   @POST("post/upload")
   suspend fun uploadMedia(@Part data: MultipartBody.Part, @Part("metadata") metadata: RequestBody)
 
-  @POST("/post/{id}/like")
+  @POST("post/{id}/like")
   suspend fun like(@Path("id") id: String)
 
   @GET("post/{id}/likes")
   suspend fun isLiked(@Path("id") id: String): Boolean
 
-  @GET("/user/{id}")
+  @GET("user/{id}")
   suspend fun getUser(@Path("id") id: String): UserModel
 
-  @GET("/user/name/{username}")
+  @GET("user/name/{username}")
   suspend fun getByUsername(@Path("username") username: String): UserModel
 
-  @GET("/user/follows")
+  @GET("user/follows")
   suspend fun follows(@Query("followed") user: String): Boolean
 
-  @POST("/user/follow")
+  @POST("user/follow")
   suspend fun follow(@Body toFollow: String): String
 
-  @POST("/user/unfollow")
+  @POST("user/unfollow")
   suspend fun unfollow(@Body toFollow: String): String
 
-  @GET("/user/contains")
+  @GET("user/contains")
   suspend fun contains(@Query("toSearch") toSearch: String, @Query("offset") offset: Number, @Query("max") max: Number)
 
   @Multipart
-  @POST("/user/upload")
+  @POST("user/upload")
   suspend fun uploadUserMedia(@Part data: MultipartBody.Part, @Part("metadata") metadata: RequestBody)
 
-  @DELETE("/user")
+  @DELETE("user")
   suspend fun deleteUser()
 }

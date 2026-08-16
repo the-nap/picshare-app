@@ -1,5 +1,6 @@
 package com.picshare.app.ui.gallery
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.picshare.app.api.network.Util.NetworkResult
@@ -23,8 +24,8 @@ class GalleryViewModel @Inject constructor (
   private var offset = 0
   private val max = 12
 
-  fun initialize(key: String, toSearch: String){
-    if(key.isEmpty() || toSearch.isEmpty())
+  fun initialize(key: String?, toSearch: String?){
+    if(key.isNullOrEmpty() || toSearch.isNullOrEmpty())
       return
     if(key == uiState.value.key && toSearch == uiState.value.toSearch)
       return
@@ -53,6 +54,7 @@ class GalleryViewModel @Inject constructor (
         )
         when (result){
           is NetworkResult.Success -> {
+            Log.d("GalleryViewModel", ("Received ${result.data.size} posts"))
             _uiState.update{ it.copy(
               posts = it.posts + result.data,
               hasMore = result.data.size == max

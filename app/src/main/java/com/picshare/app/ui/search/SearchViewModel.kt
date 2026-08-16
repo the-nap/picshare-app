@@ -1,6 +1,5 @@
 package com.picshare.app.ui.search
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.picshare.app.data.repository.PostRepository
@@ -9,11 +8,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,8 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @HiltViewModel
 class SearchViewModel @Inject constructor (
   private val postRepository: PostRepository,
-  private val userRepository: UserRepository,
-  savedStateHandle: SavedStateHandle
+  private val userRepository: UserRepository
 ): ViewModel(){
 
   private val _uiState = MutableStateFlow(SearchUiState())
@@ -34,7 +30,7 @@ class SearchViewModel @Inject constructor (
   init {
     viewModelScope.launch {
       val query = uiState
-        .map {it.toSearch}
+        .map {it.typedText}
         .debounce(300.milliseconds)
         .distinctUntilChanged()
 
@@ -46,20 +42,22 @@ class SearchViewModel @Inject constructor (
         query to type
       }.collect { (query, type) ->
         if(query.length > 2)
-          search(query, type)
+          setSearch(query, type)
+        else
+          _uiState.update { it.copy(query = "") }
       }
     }
   }
-  fun search(query: String, type: SearchType){
+  fun setSearch(query: String, type: SearchType){
     when(type) {
       SearchType.USERS -> {}
-      SearchType.TAGS -> {}
+      SearchType.TAGS -> { _uiState.update { it.copy(query = query) } }
     }
   }
 
   fun onQueryChange(query: String){
     _uiState.update {
-      it.copy(toSearch = query)
+      it.copy(typedText = query)
     }
   }
   fun onTabChange(type: SearchType){
