@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -28,7 +29,7 @@ class SearchViewModel @Inject constructor (
 ): ViewModel(){
 
   private val _uiState = MutableStateFlow(SearchUiState())
-  private val uiState = _uiState.asStateFlow()
+  val uiState = _uiState.asStateFlow()
 
   init {
     viewModelScope.launch {
@@ -54,6 +55,16 @@ class SearchViewModel @Inject constructor (
       SearchType.USERS -> {}
       SearchType.TAGS -> {}
     }
+  }
 
+  fun onQueryChange(query: String){
+    _uiState.update {
+      it.copy(toSearch = query)
+    }
+  }
+  fun onTabChange(type: SearchType){
+    _uiState.update {
+      it.copy(searchType = type)
+    }
   }
 }
