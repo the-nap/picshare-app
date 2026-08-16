@@ -1,17 +1,22 @@
 package com.picshare.app.ui.gallery
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -24,54 +29,77 @@ import com.picshare.app.BuildConfig
 
 @Composable
 fun Gallery (
-  galleryViewModel: GalleryViewModel = viewModel()
+  viewModel: GalleryViewModel = viewModel(),
+  key: String,
+  toSearch: String
 ) {
 
   val context = LocalContext.current
   val gridState = rememberLazyStaggeredGridState()
 
+  val state by viewModel.uiState.collectAsState()
+
+  LaunchedEffect(key, toSearch) {
+    viewModel.initialize(key, toSearch)
+  }
   LaunchedEffect(gridState) {
     snapshotFlow {
       gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
     }.collect { lastVisibleIndex ->
       if (lastVisibleIndex != null &&
-        lastVisibleIndex >= galleryViewModel.posts.size -5){
-          galleryViewModel.loadNextPage()
+        lastVisibleIndex >= state.posts.size - 5){
+        viewModel.loadNextPage()
       }
     }
   }
 
-  LaunchedEffect(Unit) {
-    galleryViewModel.errorEvents.collect { message ->
-      Toast.makeText(context, message, Toast.LENGTH_SHORT)
-    }
-  }
+  when {
+    !state.error.isNullOrBlank() ->
+      Text(
+        text = state.error.toString()
+      )
 
-  if (galleryViewModel.noPosts())
-    Text(
-      text = "No posts to show",
-      modifier = Modifier
-        .fillMaxWidth()
-    )
-  else
-    LazyVerticalStaggeredGrid(
-      state = gridState,
-      columns = StaggeredGridCells.Fixed(2),
-      verticalItemSpacing = 4.dp,
-      horizontalArrangement = Arrangement.spacedBy(4.dp),
-      content = {
-        items(galleryViewModel.posts) { post ->
-          AsyncImage(
-            model = ImageRequest.Builder(context)
-              .data("${BuildConfig.API_URL}/post/preview/$post.id")
-              .crossfade(true),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            modifier = Modifier
-              .fillMaxWidth()
-              .wrapContentHeight()
-          )
+    state.posts.isEmpty() ->
+      Text(
+        text = "No posts to show",
+        modifier = Modifier
+          .fillMaxWidth()
+      )
+
+    else ->
+      LazyVerticalStaggeredGrid(
+        state = gridState,
+        columns = StaggeredGridCells.Fixed(2),
+        verticalItemSpacing = 4.dp,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        content = {
+          items(state.posts) { post ->
+            AsyncImage(
+              model = ImageRequest.Builder(context)
+                .data("${BuildConfig.API_URL}/post/preview/${post.id}")
+                .crossfade(true)
+                .build(),
+              contentScale = ContentScale.Crop,
+              contentDescription = null,
+              modifier = Modifier
+                .fillMaxWidth()
+            )
+          }
+          if(state.isLoading){
+            item (
+              span = StaggeredGridItemSpan.FullLine
+            ){
+              Box(
+                modifier = Modifier.fillMaxWidth()
+                  .padding(vertical = 16.dp),
+                contentAlignment = Alignment.Center
+
+              ){
+                CircularProgressIndicator()
+              }
+            }
+          }
         }
-      }
-    )
+      )
+  }
 }
