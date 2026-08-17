@@ -5,5 +5,6 @@ import com.picshare.app.data.model.UserModel
 data class UserListUiState(
   val isLoading: Boolean = false,
   val error: String? = null,
+  val hasMore: Boolean = false,
   val users: List<UserModel> = emptyList()
 )

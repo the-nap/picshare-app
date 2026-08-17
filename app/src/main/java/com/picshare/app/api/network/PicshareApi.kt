@@ -56,7 +56,7 @@ interface PicshareApi {
   suspend fun unfollow(@Body toFollow: String): String
 
   @GET("user/contains")
-  suspend fun contains(@Query("toSearch") toSearch: String, @Query("offset") offset: Number, @Query("max") max: Number)
+  suspend fun contains(@Query("toSearch") toSearch: String, @Query("offset") offset: Number, @Query("max") max: Number): List<UserModel>
 
   @Multipart
   @POST("user/upload")
