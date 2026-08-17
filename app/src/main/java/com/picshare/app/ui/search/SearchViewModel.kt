@@ -1,5 +1,6 @@
 package com.picshare.app.ui.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.picshare.app.data.repository.PostRepository
@@ -41,6 +42,7 @@ class SearchViewModel @Inject constructor (
       combine(query, type) {query, type ->
         query to type
       }.collect { (query, type) ->
+        Log.d("SearchViewModel", "Flow collect: query='$query', type=$type")
         if(query.length > 2)
           setSearch(query, type)
         else
@@ -49,6 +51,7 @@ class SearchViewModel @Inject constructor (
     }
   }
   fun setSearch(query: String, type: SearchType){
+    Log.d("SearchViewModel", "setSearch: query='$query', type=$type")
     when(type) {
       SearchType.USERS -> {}
       SearchType.TAGS -> { _uiState.update { it.copy(query = query) } }
