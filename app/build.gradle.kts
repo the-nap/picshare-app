@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.security)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.coil)
+    implementation(libs.coil.network)
     implementation(libs.navigation)
     implementation(libs.composeIcons.cssGg)
 

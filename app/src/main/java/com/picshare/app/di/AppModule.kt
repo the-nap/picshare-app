@@ -1,5 +1,11 @@
 package com.picshare.app.di
 
+import android.content.Context
+import coil3.ImageLoader
+import coil3.disk.DiskCache
+import coil3.disk.directory
+import coil3.memory.MemoryCache
+import coil3.request.crossfade
 import com.google.gson.Gson
 import com.picshare.app.BuildConfig
 import com.picshare.app.api.network.PicshareApi
@@ -10,6 +16,7 @@ import com.picshare.app.data.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -20,6 +27,25 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+  @Provides
+  @Singleton
+  fun provideImageLoader(@ApplicationContext context: Context): ImageLoader {
+    return ImageLoader.Builder(context)
+      .crossfade(true)
+      .memoryCache {
+        MemoryCache.Builder()
+          .maxSizePercent(context, 0.25)
+          .build()
+      }
+      .diskCache {
+        DiskCache.Builder()
+          .directory(context.cacheDir.resolve("image_cache"))
+          .maxSizePercent(0.02)
+          .build()
+      }
+      .build()
+  }
 
   @Provides
   @Singleton
