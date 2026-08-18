@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.picshare.app.ui.gallery.Gallery
+import com.picshare.app.ui.userlist.UserList
+import com.picshare.app.ui.userlist.UserListUiState
 
 @Composable
 fun SearchScreen(
@@ -105,7 +107,7 @@ fun SearchContent(
     }
 
     when(searchType){
-      SearchType.USERS -> {}
+      SearchType.USERS -> UserList(username = query)
       SearchType.TAGS -> Gallery(key = "tag", toSearch = query)
     }
   }

@@ -3,9 +3,6 @@ package com.picshare.app.ui.search
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.picshare.app.data.repository.PostRepository
-import com.picshare.app.data.repository.UserRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +12,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
@@ -41,18 +37,15 @@ class SearchViewModel (
       }.collect { (query, type) ->
         Log.d("SearchViewModel", "Flow collect: query='$query', type=$type")
         if(query.length > 2)
-          setSearch(query, type)
+          setSearch(query)
         else
           _uiState.update { it.copy(query = "") }
       }
     }
   }
-  fun setSearch(query: String, type: SearchType){
-    Log.d("SearchViewModel", "setSearch: query='$query', type=$type")
-    when(type) {
-      SearchType.USERS -> {} //ignore this
-      SearchType.TAGS -> { _uiState.update { it.copy(query = query) } }
-    }
+  fun setSearch(query: String){
+    Log.d("SearchViewModel", "setSearch: query='$query', type=${uiState.value.searchType}")
+    _uiState.update { it.copy(query = query)}
   }
 
   fun onQueryChange(query: String){
