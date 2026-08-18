@@ -57,7 +57,8 @@ fun Gallery (
       val lastIndex = gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
       lastIndex to state.posts.size
     }.collect { (lastVisibleIndex, totalItems) ->
-      if (lastVisibleIndex != null &&
+      if (totalItems >= viewModel.getMax() &&
+        lastVisibleIndex != null &&
         (lastVisibleIndex >= totalItems - 5)) {
         viewModel.getNext()
       }

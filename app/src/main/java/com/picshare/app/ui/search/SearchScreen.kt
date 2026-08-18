@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.picshare.app.ui.gallery.Gallery
 import com.picshare.app.ui.userlist.UserList
-import com.picshare.app.ui.userlist.UserListUiState
 
 @Composable
 fun SearchScreen(

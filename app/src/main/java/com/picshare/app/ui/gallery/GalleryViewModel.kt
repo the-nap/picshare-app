@@ -7,11 +7,11 @@ import coil3.ImageLoader
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,18 +27,27 @@ class GalleryViewModel @Inject constructor (
   val uiState = _uiState.asStateFlow()
 
   private val max = 12
+  fun getMax() = max
+
+  private val request = MutableSharedFlow<PostBatchRequest>(extraBufferCapacity = 1)
 
   init {
     viewModelScope.launch {
-      uiState
-        .distinctUntilChanged { old, new ->
-          old.key == new.key && old.toSearch == new.toSearch && old.currentOffset == new.currentOffset
-        }
-        .filter { state -> !state.isLoading }
-        .filter { state -> state.hasMore }
-        .collectLatest {
-          _uiState.update { it.copy(isLoading = true) }
-          loadNextPage()
+      request
+        .onEach{ Log.d(TAG, "Request received: $it")}
+        .collectLatest { request ->
+          _uiState.update {
+            it.copy(
+              key = request.key,
+              toSearch = request.toSearch,
+              currentOffset = request.offset,
+              posts = if(request.resetFlag) emptyList() else it.posts,
+              error = null,
+              isLoading = true,
+              hasMore = true,
+            )
+          }
+          fetchPosts()
         }
     }
   }
@@ -51,27 +60,32 @@ class GalleryViewModel @Inject constructor (
       return
     }
 
-    Log.d(TAG, "set: Resetting state and loading first page")
-    _uiState.update { it.copy(
-      key = key,
-      toSearch = toSearch,
-      posts = emptyList(),
-      hasMore = true,
-      isLoading = false,
-      error = null,
-      currentOffset = 0
-    ) }
+    request.tryEmit(
+      PostBatchRequest(
+        key = key,
+        toSearch = toSearch,
+        offset = 0,
+        resetFlag = true
+      )
+    )
   }
 
   fun getNext(){
-    _uiState.update {
-      if(!it.isLoading && it.hasMore)
-        it.copy( currentOffset = it.currentOffset + 1)
-      else it
-    }
+    val state = _uiState.value
+    if(state.isLoading || state.hasMore)
+      return
+    request.tryEmit(
+      PostBatchRequest(
+        key = state.key,
+        toSearch = state.toSearch,
+        offset = state.currentOffset + 1,
+        resetFlag = false
+      )
+    )
+
   }
 
-  private suspend fun loadNextPage(){
+  private suspend fun fetchPosts(){
     val state = uiState.value
     Log.d(TAG, "loadNextPage: Starting request (key='${state.key}', search='${state.toSearch}', offset=$state.currentOffset)")
     _uiState.update { it.copy(isLoading = true, error = null) }
@@ -87,7 +101,8 @@ class GalleryViewModel @Inject constructor (
           Log.d(TAG, "Received ${result.data.size} posts. Total posts now: ${uiState.value.posts.size + result.data.size}")
           _uiState.update{ it.copy(
             posts = it.posts + result.data,
-            hasMore = result.data.size == max
+            hasMore = result.data.size == max,
+            error = null
           ) }
         }
         is NetworkResult.Error -> {
