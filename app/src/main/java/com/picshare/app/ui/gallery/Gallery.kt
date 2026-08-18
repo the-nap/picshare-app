@@ -36,8 +36,8 @@ import com.picshare.app.BuildConfig
 @Composable
 fun Gallery (
   viewModel: GalleryViewModel = hiltViewModel(),
-  key: String? = null,
-  toSearch: String? = null,
+  key: String = "feed",
+  toSearch: String = "",
   imageLoader: ImageLoader = viewModel.imageLoader
 ) {
 
@@ -49,7 +49,7 @@ fun Gallery (
 
   LaunchedEffect(key, toSearch) {
     Log.d("Gallery", "LaunchedEffect(key, toSearch) triggered: key='$key', search='$toSearch'")
-    viewModel.initialize(key, toSearch)
+    viewModel.set(key, toSearch)
   }
 
   LaunchedEffect(gridState) {
@@ -59,26 +59,12 @@ fun Gallery (
     }.collect { (lastVisibleIndex, totalItems) ->
       if (lastVisibleIndex != null &&
         (lastVisibleIndex >= totalItems - 5)) {
-        viewModel.loadNextPage()
+        viewModel.getNext()
       }
     }
   }
 
   when {
-    state.posts.isEmpty() ->
-      Text(
-        text = "No posts to show",
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(16.dp)
-      )
-
-    !state.error.isNullOrBlank() ->
-      Text(
-        text = state.error.toString(),
-        modifier = Modifier.padding(16.dp)
-      )
-
     state.isLoading && state.posts.isEmpty() ->
       Box(
         modifier = Modifier.fillMaxSize(),
@@ -86,6 +72,20 @@ fun Gallery (
       ) {
         CircularProgressIndicator()
       }
+
+    !state.error.isNullOrBlank() ->
+      Text(
+        text = state.error.toString(),
+        modifier = Modifier.padding(16.dp)
+      )
+
+    state.posts.isEmpty() ->
+      Text(
+        text = "No posts to show",
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp)
+      )
 
     else ->
       LazyVerticalStaggeredGrid(

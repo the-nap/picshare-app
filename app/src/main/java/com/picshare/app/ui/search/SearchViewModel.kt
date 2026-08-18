@@ -19,10 +19,7 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
-@HiltViewModel
-class SearchViewModel @Inject constructor (
-  private val postRepository: PostRepository,
-  private val userRepository: UserRepository
+class SearchViewModel (
 ): ViewModel(){
 
   private val _uiState = MutableStateFlow(SearchUiState())
@@ -32,8 +29,8 @@ class SearchViewModel @Inject constructor (
     viewModelScope.launch {
       val query = uiState
         .map {it.typedText}
-        .debounce(300.milliseconds)
         .distinctUntilChanged()
+        .debounce(300.milliseconds)
 
       val type = uiState
         .map{ it.searchType }
@@ -53,7 +50,7 @@ class SearchViewModel @Inject constructor (
   fun setSearch(query: String, type: SearchType){
     Log.d("SearchViewModel", "setSearch: query='$query', type=$type")
     when(type) {
-      SearchType.USERS -> {}
+      SearchType.USERS -> {} //ignore this
       SearchType.TAGS -> { _uiState.update { it.copy(query = query) } }
     }
   }
