@@ -1,25 +1,42 @@
 package com.picshare.app.ui.navigation
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import com.picshare.app.ui.feed.FeedScreen
+import com.picshare.app.ui.post.post.PostScreen
 import com.picshare.app.ui.search.SearchScreen
-import com.picshare.app.ui.user.UserScreen
+import com.picshare.app.ui.user.user_screen.UserScreen
 
 @Composable
-fun AppNavHost(navController: NavHostController, padding: PaddingValues){
+fun AppNavHost(
+  navController: NavHostController,
+  padding: PaddingValues,
+  navigationViewModel: NavigationViewModel = hiltViewModel()
+){
+
+  val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+  navigationViewModel.onEvent(
+    NavEvent.OnSetContent(
+      activityNavController = navController,
+    ){ backDispatcher?.onBackPressed() }
+  )
+
   NavHost(
-    navController = navController,
-    startDestination = Feed,
+    navController = navigationViewModel.activityNavController,
+    startDestination = Route.Feed,
     modifier = Modifier.padding(padding)
   ){
-    composable<Feed> { FeedScreen() }
-    composable<Search> { SearchScreen() }
-    composable<User> { UserScreen() }
+    composable<Route.Feed> { FeedScreen() }
+    composable<Route.Search> { SearchScreen() }
+    composable<Route.User> { UserScreen() }
+    dialog<Route.Post>{ PostScreen() }
   }
 }
