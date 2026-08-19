@@ -3,16 +3,14 @@ package com.picshare.app.ui.navigation
 import kotlinx.serialization.Serializable
 
 sealed interface Route {
+  @Serializable
+  object Feed: Route
+  @Serializable
+  object Search: Route
 
   @Serializable
-  data object Feed: Route
+  data class User(val userId: String?): Route
 
   @Serializable
-  data object Search: Route
-
-  @Serializable
-  data object User: Route
-
-  @Serializable
-  data object Post: Route
+  data class Post(val postId: String): Route
 }

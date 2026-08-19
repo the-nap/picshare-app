@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
+import androidx.navigation.toRoute
 import com.picshare.app.ui.feed.FeedScreen
 import com.picshare.app.ui.post.post.PostScreen
 import com.picshare.app.ui.search.SearchScreen
@@ -34,9 +35,11 @@ fun AppNavHost(
     startDestination = Route.Feed,
     modifier = Modifier.padding(padding)
   ){
-    composable<Route.Feed> { FeedScreen() }
-    composable<Route.Search> { SearchScreen() }
-    composable<Route.User> { UserScreen() }
-    dialog<Route.Post>{ PostScreen() }
+      composable<Route.Feed> { FeedScreen() }
+      composable<Route.Search> { SearchScreen() }
+      composable<Route.User> { UserScreen() }
+      dialog<Route.Post> { backStackEntry ->
+        val route = backStackEntry.toRoute<Route.Post>()
+        PostScreen(postId = route.postId) }
   }
 }

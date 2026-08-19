@@ -20,7 +20,7 @@ class NavigationViewModel @Inject constructor(): ViewModel() {
       }
 
       is NavEvent.OnBack -> onBackPressed()
-      is NavEvent.OnNavigateTo -> {}
+      is NavEvent.OnNavigateTo -> activityNavController.navigate(event.destination)
     }
   }
 }
