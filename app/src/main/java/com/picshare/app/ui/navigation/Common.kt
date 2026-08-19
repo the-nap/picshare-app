@@ -59,14 +59,14 @@ fun NavigationFooter(
   }
 }
 
-enum class Destination @OptIn(ExperimentalSerializationApi::class) constructor(
+enum class Destination constructor(
   val label: String,
   val icon: ImageVector,
-  val route: Any
+  val route: Route
 ) {
-  FEED(label = "Feed", icon = CssGgIcons.Image, route = Feed),
-  SEARCH(label = "Search", icon = CssGgIcons.Search, route = Search),
-  USER(label = "User", icon = CssGgIcons.User, route = User)
+  FEED(label = "Feed", icon = CssGgIcons.Image, route = Route.Feed),
+  SEARCH(label = "Search", icon = CssGgIcons.Search, route = Route.Search),
+  USER(label = "User", icon = CssGgIcons.User, route = Route.User)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

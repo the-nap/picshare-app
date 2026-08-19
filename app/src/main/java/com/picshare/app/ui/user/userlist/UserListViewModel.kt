@@ -1,4 +1,4 @@
-package com.picshare.app.ui.userlist
+package com.picshare.app.ui.user.userlist
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

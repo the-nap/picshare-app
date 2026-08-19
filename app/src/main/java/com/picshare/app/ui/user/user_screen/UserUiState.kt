@@ -1,4 +1,4 @@
-package com.picshare.app.ui.user
+package com.picshare.app.ui.user.user_screen
 
 import com.picshare.app.data.model.UserModel
 

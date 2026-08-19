@@ -1,12 +1,17 @@
-package com.picshare.app.ui.gallery
+package com.picshare.app.ui.post
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
-import com.picshare.app.api.network.Util.NetworkResult
+import com.picshare.app.api.network.Util
+import com.picshare.app.data.model.PostModel
 import com.picshare.app.data.repository.PostRepository
+import com.picshare.app.ui.post.gallery.GalleryUiState
+import com.picshare.app.ui.post.gallery.PostBatchRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +22,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GalleryViewModel @Inject constructor (
+class PostViewModel @Inject constructor (
   private val repository: PostRepository,
   val imageLoader: ImageLoader
 ): ViewModel() {
@@ -26,6 +31,8 @@ class GalleryViewModel @Inject constructor (
   private val _uiState = MutableStateFlow(GalleryUiState())
   val uiState = _uiState.asStateFlow()
 
+  private val _selectedPost = MutableStateFlow<PostModel?>(null)
+  val selectedPost = _selectedPost.asStateFlow()
   private val max = 12
   fun getMax() = max
 
@@ -34,7 +41,7 @@ class GalleryViewModel @Inject constructor (
   init {
     viewModelScope.launch {
       request
-        .onEach{ Log.d(TAG, "Request received: $it")}
+        .onEach { Log.d(TAG, "Request received: $it")}
         .collectLatest { request ->
           _uiState.update {
             it.copy(
@@ -97,7 +104,7 @@ class GalleryViewModel @Inject constructor (
         max = max,
       )
       when (result){
-        is NetworkResult.Success -> {
+        is Util.NetworkResult.Success -> {
           Log.d(TAG, "Received ${result.data.size} posts. Total posts now: ${uiState.value.posts.size + result.data.size}")
           _uiState.update{ it.copy(
             posts = it.posts + result.data,
@@ -105,7 +112,7 @@ class GalleryViewModel @Inject constructor (
             error = null
           ) }
         }
-        is NetworkResult.Error -> {
+        is Util.NetworkResult.Error -> {
           Log.e(TAG, "Error fetching posts: ${result.message}")
           _uiState.update{ it.copy(error = result.message) }
         }

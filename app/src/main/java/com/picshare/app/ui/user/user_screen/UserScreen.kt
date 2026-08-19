@@ -1,7 +1,5 @@
-package com.picshare.app.ui.user
+package com.picshare.app.ui.user.user_screen
 
-import android.app.Activity
-import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,8 +37,7 @@ import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
 import com.picshare.app.data.model.UserModel
-import com.picshare.app.ui.LoginActivity
-import com.picshare.app.ui.gallery.Gallery
+import com.picshare.app.ui.post.gallery.Gallery
 
 @Composable
 fun UserScreen(

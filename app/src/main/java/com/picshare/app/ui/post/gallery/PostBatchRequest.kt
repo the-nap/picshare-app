@@ -1,4 +1,4 @@
-package com.picshare.app.ui.gallery
+package com.picshare.app.ui.post.gallery
 
 data class PostBatchRequest(
   val key: String,

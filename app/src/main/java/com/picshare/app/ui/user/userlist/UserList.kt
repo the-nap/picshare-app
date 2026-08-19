@@ -1,4 +1,4 @@
-package com.picshare.app.ui.userlist
+package com.picshare.app.ui.user.userlist
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

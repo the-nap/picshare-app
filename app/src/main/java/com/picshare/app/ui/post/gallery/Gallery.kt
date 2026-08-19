@@ -1,4 +1,4 @@
-package com.picshare.app.ui.gallery
+package com.picshare.app.ui.post.gallery
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -32,10 +32,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
+import com.picshare.app.ui.post.PostViewModel
 
 @Composable
 fun Gallery (
-  viewModel: GalleryViewModel = hiltViewModel(),
+  viewModel: PostViewModel = hiltViewModel(),
   key: String = "feed",
   toSearch: String = "",
   imageLoader: ImageLoader = viewModel.imageLoader
