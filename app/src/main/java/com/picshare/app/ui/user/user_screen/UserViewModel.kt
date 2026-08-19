@@ -34,13 +34,35 @@ class UserViewModel @Inject constructor(
   private val _buttonState = MutableStateFlow(ButtonState(onClick = { logout() }, text = "Log Out"))
   val buttonState = _buttonState.asStateFlow()
 
-  fun set(user: UserModel?){
-    if(user == null)
+  fun set(userId: String?){
+    if(userId == null || userId ==authRepository.currentUserId)
       getThisUser()
     else {
-      _uiState.update { it.copy(user = user) }
+      fetchUser(userId)
       assignButton()
 
+    }
+  }
+
+  fun fetchUser(id: String){
+    viewModelScope.launch {
+      _uiState.update { it.copy(isLoading = true) }
+      when(val result = userRepository.getUser(id)){
+        is NetworkResult.Success -> {
+            _uiState.update { it.copy(
+              user = result.data,
+              isLoading = false
+            ) }
+        }
+        is NetworkResult.Error -> {
+          _uiState.update {
+            it.copy(
+              error = result.message,
+              isLoading = false
+            )
+          }
+        }
+      }
     }
   }
   fun assignButton(){

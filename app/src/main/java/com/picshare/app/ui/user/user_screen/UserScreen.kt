@@ -32,27 +32,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
 import com.picshare.app.data.model.UserModel
 import com.picshare.app.ui.post.gallery.Gallery
-import com.picshare.app.ui.user.SelectedUserViewModel
 
 @Composable
 fun UserScreen(
   viewModel: UserViewModel = hiltViewModel(),
-  sharedViewModel: SelectedUserViewModel = hiltViewModel(),
+  userId: String?,
   imageLoader: ImageLoader = viewModel.imageLoader,
 ) {
 
   val state by viewModel.uiState.collectAsState()
-  val selectedUser by sharedViewModel.selectedUser.collectAsStateWithLifecycle()
 
-  LaunchedEffect(selectedUser) {
-    viewModel.set(selectedUser)
+  LaunchedEffect(userId) {
+    viewModel.set(userId)
   }
 
   when {
