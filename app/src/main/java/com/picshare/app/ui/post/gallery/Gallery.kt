@@ -32,11 +32,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
-import com.picshare.app.ui.post.PostViewModel
+import com.picshare.app.ui.post.SelectedPostViewModel
 
 @Composable
 fun Gallery (
-  viewModel: PostViewModel = hiltViewModel(),
+  viewModel: SelectedPostViewModel = hiltViewModel(),
   key: String = "feed",
   toSearch: String = "",
   imageLoader: ImageLoader = viewModel.imageLoader

@@ -1,7 +1,6 @@
 package com.picshare.app.ui.post
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
@@ -11,7 +10,6 @@ import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.ui.post.gallery.GalleryUiState
 import com.picshare.app.ui.post.gallery.PostBatchRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +20,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PostViewModel @Inject constructor (
+class SelectedPostViewModel @Inject constructor (
   private val repository: PostRepository,
   val imageLoader: ImageLoader
 ): ViewModel() {

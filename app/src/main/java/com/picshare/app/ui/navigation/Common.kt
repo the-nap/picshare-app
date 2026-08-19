@@ -30,7 +30,6 @@ import compose.icons.CssGgIcons
 import compose.icons.cssggicons.Image
 import compose.icons.cssggicons.Search
 import compose.icons.cssggicons.User
-import kotlinx.serialization.ExperimentalSerializationApi
 
 @Composable
 fun NavigationFooter(
