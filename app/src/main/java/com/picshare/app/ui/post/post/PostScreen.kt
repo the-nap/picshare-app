@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,28 +35,30 @@ import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
-import com.picshare.app.data.model.UserModel
-import com.picshare.app.ui.post.SelectedPostViewModel
 import com.picshare.app.ui.theme.PicshareTheme
 import compose.icons.CssGgIcons
 import compose.icons.cssggicons.Heart
 
 @Composable
 fun PostScreen(
-  viewModel: SelectedPostViewModel = hiltViewModel(),
+  postId: String,
+  viewModel: PostViewModel = hiltViewModel(),
   imageLoader: ImageLoader = viewModel.imageLoader
 ) {
 
-  val post by viewModel.selectedPost.collectAsStateWithLifecycle()
-  lateinit var user: UserModel
+  LaunchedEffect(postId) {
+    viewModel.load(postId)
+  }
+
+  val state by viewModel.uiState.collectAsStateWithLifecycle()
 
   PostContent(
-    username = user.username,
-    avatarUrl = "${BuildConfig.AVATAR_URL}/${user.id}",
-    imageUrl = "${BuildConfig.MEDIA_URL}/${post?.id}",
-    description = post?.description,
-    tags = post?.tags,
-    likes = post?.likesNumber,
+    username = state.user?.username,
+    avatarUrl = "${BuildConfig.AVATAR_URL}/${state.user?.id}",
+    imageUrl = "${BuildConfig.MEDIA_URL}/${state.post?.id}",
+    description = state.post?.description,
+    tags = state.post?.tags,
+    likes = state.post?.likesNumber,
     showLikeButton = false,
     likeEnabled = false,
     onLikeClick = {println("test")},

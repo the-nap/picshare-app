@@ -1,6 +1,7 @@
 package com.picshare.app.ui.post.gallery
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -32,14 +33,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
-import com.picshare.app.ui.post.SelectedPostViewModel
+import com.picshare.app.ui.navigation.NavEvent
 
 @Composable
 fun Gallery (
-  viewModel: SelectedPostViewModel = hiltViewModel(),
+  viewModel: GalleryViewModel = hiltViewModel(),
   key: String = "feed",
   toSearch: String = "",
-  imageLoader: ImageLoader = viewModel.imageLoader
+  imageLoader: ImageLoader = viewModel.imageLoader,
+  onNavigationEvent: (NavEvent) -> Unit
 ) {
 
   val gridState = rememberLazyStaggeredGridState()
@@ -114,6 +116,9 @@ fun Gallery (
               .fillMaxWidth()
               .aspectRatio(aspectRatio)
               .padding(vertical = 2.dp)
+              .clickable(
+                onClick = {}
+              )
           )
         }
         if (state.isLoading) {
