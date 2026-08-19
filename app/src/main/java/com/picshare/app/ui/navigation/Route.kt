@@ -9,7 +9,7 @@ sealed interface Route {
   object Search: Route
 
   @Serializable
-  data class User(val userId: String?): Route
+  data class User(val userId: String? = null): Route
 
   @Serializable
   data class Post(val postId: String): Route

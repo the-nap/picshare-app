@@ -34,14 +34,16 @@ import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.ui.navigation.NavEvent
+import com.picshare.app.ui.navigation.NavigationViewModel
+import com.picshare.app.ui.navigation.Route
 
 @Composable
 fun Gallery (
   viewModel: GalleryViewModel = hiltViewModel(),
+  navigationViewModel: NavigationViewModel = hiltViewModel(),
   key: String = "feed",
   toSearch: String = "",
   imageLoader: ImageLoader = viewModel.imageLoader,
-  onNavigationEvent: (NavEvent) -> Unit
 ) {
 
   val gridState = rememberLazyStaggeredGridState()
@@ -117,7 +119,13 @@ fun Gallery (
               .aspectRatio(aspectRatio)
               .padding(vertical = 2.dp)
               .clickable(
-                onClick = {}
+                onClick = {
+                  navigationViewModel.onEvent(
+                    NavEvent.OnNavigateTo(
+                      Route.Post(postId = post.id)
+                    )
+                  )
+                }
               )
           )
         }

@@ -1,5 +1,6 @@
 package com.picshare.app.ui.user.userlist
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,12 +35,15 @@ import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.data.model.UserModel
+import com.picshare.app.ui.navigation.NavEvent
+import com.picshare.app.ui.navigation.NavigationViewModel
+import com.picshare.app.ui.navigation.Route
 
 @Composable
 fun UserList (
   viewModel: UserListViewModel = hiltViewModel(),
   imageLoader: ImageLoader = viewModel.imageLoader,
-  username: String
+  username: String,
 ) {
   val state by viewModel.uiState.collectAsState()
   val listState = rememberLazyListState()
@@ -87,51 +91,60 @@ fun UserList (
         }
       }
   }
-  }
+}
 
-  @Composable
-  fun UserListItem(
-    user: UserModel,
-    imageLoader: ImageLoader,
-    modifier: Modifier = Modifier
-  ) {
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-      AsyncImage(
-        imageLoader = imageLoader,
-        model = "${BuildConfig.AVATAR_URL}/${user.id}",
-        placeholder = ColorPainter(MaterialTheme.colorScheme.surfaceVariant),
-        error = ColorPainter(MaterialTheme.colorScheme.errorContainer),
-        contentScale = ContentScale.Fit,
-        contentDescription = "${user.username}'s avatar",
-        modifier = Modifier
-          .size(48.dp)
-          .clip(
-            RoundedCornerShape(100)
+@Composable
+fun UserListItem(
+  user: UserModel,
+  imageLoader: ImageLoader,
+  navigationViewModel: NavigationViewModel = hiltViewModel()
+) {
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 16.dp, vertical = 12.dp)
+      .clickable(
+        onClick = {
+          navigationViewModel.onEvent(
+            NavEvent.OnNavigateTo(
+              Route.User(userId = user.id)
+            )
           )
+        }
       )
-
-      Spacer(modifier = Modifier.width(12.dp))
-
-      Column(modifier = Modifier.weight(1f)) {
-        Text(
-          text = user.username,
-          style = MaterialTheme.typography.bodyLarge,
-          fontWeight = FontWeight.SemiBold,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis
+  ) {
+    AsyncImage(
+      imageLoader = imageLoader,
+      model = "${BuildConfig.AVATAR_URL}/${user.id}",
+      placeholder = ColorPainter(MaterialTheme.colorScheme.surfaceVariant),
+      error = ColorPainter(MaterialTheme.colorScheme.errorContainer),
+      contentScale = ContentScale.Fit,
+      contentDescription = "${user.username}'s avatar",
+      modifier = Modifier
+        .size(48.dp)
+        .clip(
+          RoundedCornerShape(100)
         )
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(
-          text = "${user.followersCount} followers",
-          style = MaterialTheme.typography.bodySmall,
-          color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-      }
+    )
+
+    Spacer(modifier = Modifier.width(12.dp))
+
+    Column(modifier = Modifier.weight(1f)) {
+      Text(
+        text = user.username,
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.SemiBold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
+      Spacer(modifier = Modifier.height(2.dp))
+      Text(
+        text = "${user.followersCount} followers",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+      )
     }
   }
+}
 
