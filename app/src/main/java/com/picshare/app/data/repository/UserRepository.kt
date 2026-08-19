@@ -31,4 +31,22 @@ class UserRepository (
       dataSource.contains(username, offset, max)
     }
   }
+
+  suspend fun follows(id: String): NetworkResult<Boolean>{
+    return handleRequest(dispatcher){
+      dataSource.follows(id)
+    }
+  }
+
+  suspend fun follow(id: String): NetworkResult<String>{
+    return handleRequest(dispatcher){
+      dataSource.follow(id)
+    }
+  }
+
+  suspend fun unfollow(id: String): NetworkResult<String>{
+    return handleRequest(dispatcher){
+      dataSource.unfollow(id)
+    }
+  }
 }

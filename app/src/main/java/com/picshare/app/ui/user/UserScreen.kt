@@ -1,5 +1,7 @@
 package com.picshare.app.ui.user
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +39,7 @@ import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
 import com.picshare.app.data.model.UserModel
+import com.picshare.app.ui.LoginActivity
 import com.picshare.app.ui.gallery.Gallery
 
 @Composable
@@ -46,9 +50,17 @@ fun UserScreen(
 ) {
 
   val state by viewModel.uiState.collectAsState()
+  val context = LocalContext.current
 
   LaunchedEffect(user) {
     viewModel.set(user)
+  }
+
+  LaunchedEffect(Unit) {
+    viewModel.logoutEvent.collect{
+      context.startActivity(Intent(context, LoginActivity::class.java))
+      (context as? Activity)?.finish()
+    }
   }
 
   when {
@@ -123,20 +135,16 @@ fun UserScreen(
               StatItem(label = "Followers", count = user.followersCount)
               StatItem(label = "Followed", count = user.followedCount)
             }
-
+            val button by viewModel.buttonState.collectAsState()
             Button(
-              onClick = if (state.isMe) {
-                { viewModel.follow() }
-              } else {
-                { viewModel.logout() }
-              },
+              onClick = button.onClick,
               colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
               )
             ) {
               Text(
-                text = if (state.isMe) "Log Out" else "follow"
+                text = button.text
               )
             }
           }

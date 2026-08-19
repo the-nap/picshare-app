@@ -8,7 +8,9 @@ import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.data.model.UserModel
 import com.picshare.app.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,17 +28,57 @@ class UserViewModel @Inject constructor(
   private val _uiState = MutableStateFlow(UserUiState())
   val uiState = _uiState.asStateFlow()
 
+  private val _buttonState = MutableStateFlow(ButtonState(onClick = { logout() }, text = "Log Out"))
+  val buttonState = _buttonState.asStateFlow()
+
   fun set(user: UserModel?){
     if(user == null)
       getThisUser()
-    else _uiState.update { it.copy( user = user) }
+    else {
+      _uiState.update { it.copy(user = user) }
+      assignButton()
+
+    }
+  }
+  fun assignButton(){
+    viewModelScope.launch {
+      when(val result = userRepository.follows(uiState.value.user!!.id)){
+        is NetworkResult.Success -> {
+          if(result.data)
+            _buttonState.update { it.copy(
+              text = "Unfollow",
+              onClick = { unfollow() }
+            ) }
+          else
+            _buttonState.update { it.copy(
+              text = "Follow",
+              onClick = { follow() }
+            ) }
+        }
+        is NetworkResult.Error -> return@launch
+      }
+
+    }
   }
 
   fun follow(){
-
+    viewModelScope.launch {
+      userRepository.follow(uiState.value.user!!.id)
+    }
   }
-  fun logout(){
+  fun unfollow(){
+    viewModelScope.launch {
+      userRepository.unfollow(uiState.value.user!!.id)
+    }
+  }
 
+  private val _logoutEvent = MutableSharedFlow<Unit>()
+  val logoutEvent = _logoutEvent.asSharedFlow()
+  fun logout(){
+    viewModelScope.launch{
+      authRepository.logout()
+      _logoutEvent.emit(Unit)
+    }
   }
   private fun getThisUser(){
     if(authRepository.currentUserId == null)
@@ -53,7 +95,13 @@ class UserViewModel @Inject constructor(
               isLoading = false
             )
           }
-        }
+            _buttonState.update {
+              it.copy(
+                onClick = { logout() },
+                text = "Log Out",
+              )
+            }
+          }
         is NetworkResult.Error ->
           _uiState.update {
             it.copy(
