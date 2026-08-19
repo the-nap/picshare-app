@@ -24,8 +24,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,65 +70,80 @@ fun UserScreen(
       Column(
         modifier = Modifier
           .fillMaxWidth()
-          .background(MaterialTheme.colorScheme.surface)
-          .padding(16.dp)
+          .background(MaterialTheme.colorScheme.background)
       ) {
-        Row(
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(16.dp)
+        Column(
+          modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .clip(RoundedCornerShape(32.dp))
+            .shadow(8.dp)
+            .padding(12.dp),
         ) {
-          ProfileAvatar(
-            user = user,
-            imageLoader = imageLoader
-          )
-
-          Column(modifier = Modifier.weight(1f)) {
-            Text(
-              text = user.username,
-              style = MaterialTheme.typography.titleLarge,
-              color = MaterialTheme.colorScheme.onSurface,
-              fontWeight = FontWeight.Bold,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+          ) {
+            ProfileAvatar(
+              user = user,
+              imageLoader = imageLoader
             )
-            if (user.bio.isNotBlank()) {
-              Spacer(modifier = Modifier.height(4.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
               Text(
-                text = user.bio,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 3,
+                text = user.username,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
+              )
+              if (user.bio.isNotBlank()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                  text = user.bio,
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  maxLines = 3,
+                  overflow = TextOverflow.Ellipsis
+                )
+              }
+            }
+          }
+
+          Spacer(modifier = Modifier.height(20.dp))
+
+          // Bottom row: follower/followed stats + action button
+          Row(
+            modifier = Modifier
+              .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+              StatItem(label = "Followers", count = user.followersCount)
+              StatItem(label = "Followed", count = user.followedCount)
+            }
+
+            Button(
+              onClick = if (state.isMe) {
+                { viewModel.follow() }
+              } else {
+                { viewModel.logout() }
+              },
+              colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+              )
+            ) {
+              Text(
+                text = if (state.isMe) "Log Out" else "follow"
               )
             }
           }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Bottom row: follower/followed stats + action button
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-            StatItem(label = "Followers", count = user.followersCount ?: 0)
-            StatItem(label = "Followed", count = user.followedCount ?: 0)
-          }
-
-          Button(
-            onClick = if(state.isMe) {{ viewModel.follow() }} else {{ viewModel.logout() }},
-            colors = ButtonDefaults.buttonColors(
-              containerColor = MaterialTheme.colorScheme.primary,
-              contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-          ) {
-            Text(
-              text = if(state.isMe) "Log Out" else "follow"
-            )
-          }
-        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Gallery(key = "user", toSearch = user.id)
       }
     }
   }
@@ -160,26 +175,11 @@ fun ProfileAvatar(
     .size(88.dp)
     .clip(RoundedCornerShape(percent = 40))
 
-  if (LocalInspectionMode.current) {
-    // @Preview has no real network stack / configured ImageLoader.
-    // Render a stand-in instead of hitting AsyncImage — design-time only.
-    Box(
-      modifier = avatarModifier.background(MaterialTheme.colorScheme.surfaceVariant),
-      contentAlignment = Alignment.Center
-    ) {
-      Text(
-        text = user.username.take(1).uppercase(),
-        style = MaterialTheme.typography.headlineSmall
-      )
-    }
-    return
-  }
-
   AsyncImage(
-    model = "${ BuildConfig.AVATAR_URL}/${user.id}",
+    model = "${BuildConfig.AVATAR_URL}/${user.id}",
     contentDescription = "${user.username}'s profile picture",
     imageLoader = imageLoader,
-    error = painterResource(id = R.mipmap.default_avatar),
+    error = painterResource(id = R.drawable.default_avatar),
     contentScale = ContentScale.Crop,
     modifier = avatarModifier
   )

@@ -45,7 +45,7 @@ class UserViewModel @Inject constructor(
       _uiState.update {
         it.copy( isLoading = true )
       }
-      when(val result = userRepository.getUser(authRepository.currentUserId!!)){
+      when(val result = userRepository.getUser(authRepository.currentUserId!!.split(":")[2])){
         is NetworkResult.Success ->{
           _uiState.update {
             it.copy(
