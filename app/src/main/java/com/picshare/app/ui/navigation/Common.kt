@@ -65,7 +65,7 @@ enum class Destination constructor(
 ) {
   FEED(label = "Feed", icon = CssGgIcons.Image, route = Route.Feed),
   SEARCH(label = "Search", icon = CssGgIcons.Search, route = Route.Search),
-  USER(label = "User", icon = CssGgIcons.User, route = Route.User)
+  USER(label = "User", icon = CssGgIcons.User, route = Route.User())
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

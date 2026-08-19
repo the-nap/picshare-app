@@ -34,13 +34,12 @@ import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.ui.navigation.NavEvent
-import com.picshare.app.ui.navigation.NavigationViewModel
 import com.picshare.app.ui.navigation.Route
 
 @Composable
 fun Gallery (
   viewModel: GalleryViewModel = hiltViewModel(),
-  navigationViewModel: NavigationViewModel = hiltViewModel(),
+  onNavigationEvent: (NavEvent) -> Unit,
   key: String = "feed",
   toSearch: String = "",
   imageLoader: ImageLoader = viewModel.imageLoader,
@@ -120,7 +119,7 @@ fun Gallery (
               .padding(vertical = 2.dp)
               .clickable(
                 onClick = {
-                  navigationViewModel.onEvent(
+                  onNavigationEvent(
                     NavEvent.OnNavigateTo(
                       Route.Post(postId = post.id)
                     )

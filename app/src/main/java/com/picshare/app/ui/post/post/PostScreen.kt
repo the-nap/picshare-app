@@ -59,10 +59,8 @@ fun PostScreen(
     description = state.post?.description,
     tags = state.post?.tags,
     likes = state.post?.likesNumber,
-    showLikeButton = false,
-    likeEnabled = false,
     onLikeClick = {println("test")},
-    showDeleteButton = false,
+    showDeleteButton = state.isOwned,
     onDeleteClick = {println("test2")},
     imageLoader = imageLoader
   )
@@ -75,9 +73,7 @@ private fun PostContent(
   description: String?,
   tags: String?,
   likes: Number?,
-  showLikeButton: Boolean,
   likeIcon: ImageVector = CssGgIcons.Heart,
-  likeEnabled: Boolean,
   onLikeClick: () -> Unit,
   showDeleteButton: Boolean,
   onDeleteClick: () -> Unit,
@@ -134,14 +130,12 @@ private fun PostContent(
         Column(
           modifier = Modifier.padding(20.dp)
         ) {
-          if (showLikeButton) {
             Row(
               verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
               IconButton(
                 onClick = onLikeClick,
-                enabled = likeEnabled
               ) {
                 Icon(
                   imageVector = likeIcon,
@@ -155,7 +149,6 @@ private fun PostContent(
                 color = MaterialTheme.colorScheme.onSurface
               )
             }
-          }
 
           if (!description.isNullOrBlank()) {
             Text(
@@ -214,9 +207,7 @@ private fun PostContentPreview() {
       description = "A beautiful day at the beach 🌊",
       tags = "#beach #summer #italy",
       likes = 42,
-      showLikeButton = true,
       likeIcon = CssGgIcons.Heart,
-      likeEnabled = true,
       onLikeClick = {},
       showDeleteButton = true,
       onDeleteClick = {},

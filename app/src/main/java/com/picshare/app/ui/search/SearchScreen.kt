@@ -14,15 +14,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.picshare.app.ui.navigation.NavEvent
 import com.picshare.app.ui.post.gallery.Gallery
 import com.picshare.app.ui.user.userlist.UserList
 
 @Composable
 fun SearchScreen(
-  viewModel: SearchViewModel = hiltViewModel()
+  viewModel: SearchViewModel = hiltViewModel(),
+  onNavigationEvent: (NavEvent) -> Unit,
 ){
   val state = viewModel.uiState.collectAsState()
 
@@ -31,7 +32,8 @@ fun SearchScreen(
     searchType = state.value.searchType,
     typedText = state.value.typedText,
     onQueryChange = viewModel::onQueryChange,
-    onTabChange = viewModel::onTabChange
+    onTabChange = viewModel::onTabChange,
+    onNavigationEvent = onNavigationEvent
   )
 }
 
@@ -42,6 +44,7 @@ fun SearchContent(
   typedText: String,
   onQueryChange: (String) -> Unit,
   onTabChange: (SearchType) -> Unit,
+  onNavigationEvent: (NavEvent) -> Unit
 ) {
   Column(
     modifier = Modifier
@@ -106,20 +109,8 @@ fun SearchContent(
     }
 
     when(searchType){
-      SearchType.USERS -> UserList(username = query)
-      SearchType.TAGS -> Gallery(key = "tag", toSearch = query)
+      SearchType.USERS -> UserList(username = query, onNavigationEvent = onNavigationEvent)
+      SearchType.TAGS -> Gallery(key = "tag", toSearch = query, onNavigationEvent = onNavigationEvent)
     }
   }
-}
-
-@Preview()
-@Composable
-fun SearchPreview() {
-  SearchContent(
-    query = "",
-    searchType = SearchType.TAGS,
-    typedText = "",
-    onQueryChange = {},
-    onTabChange = {}
-  )
 }

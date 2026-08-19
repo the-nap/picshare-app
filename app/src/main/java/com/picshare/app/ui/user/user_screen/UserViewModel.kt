@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.api.auth.AuthRepository
-import com.picshare.app.data.model.UserModel
 import com.picshare.app.data.repository.UserRepository
 import com.picshare.app.ui.LoginActivity
 import dagger.hilt.android.lifecycle.HiltViewModel

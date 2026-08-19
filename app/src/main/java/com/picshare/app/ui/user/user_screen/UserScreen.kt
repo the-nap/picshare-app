@@ -37,13 +37,15 @@ import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
 import com.picshare.app.data.model.UserModel
+import com.picshare.app.ui.navigation.NavEvent
 import com.picshare.app.ui.post.gallery.Gallery
 
 @Composable
 fun UserScreen(
   viewModel: UserViewModel = hiltViewModel(),
-  userId: String?,
+  userId: String? = null,
   imageLoader: ImageLoader = viewModel.imageLoader,
+  onNavigationEvent: (NavEvent) -> Unit
 ) {
 
   val state by viewModel.uiState.collectAsState()
@@ -141,7 +143,7 @@ fun UserScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Gallery(key = "user", toSearch = user.id)
+        Gallery(key = "user", toSearch = user.id, onNavigationEvent = onNavigationEvent)
       }
     }
   }

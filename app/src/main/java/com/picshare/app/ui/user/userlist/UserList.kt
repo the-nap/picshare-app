@@ -36,7 +36,6 @@ import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.data.model.UserModel
 import com.picshare.app.ui.navigation.NavEvent
-import com.picshare.app.ui.navigation.NavigationViewModel
 import com.picshare.app.ui.navigation.Route
 
 @Composable
@@ -44,6 +43,7 @@ fun UserList (
   viewModel: UserListViewModel = hiltViewModel(),
   imageLoader: ImageLoader = viewModel.imageLoader,
   username: String,
+  onNavigationEvent: (NavEvent) -> Unit
 ) {
   val state by viewModel.uiState.collectAsState()
   val listState = rememberLazyListState()
@@ -83,7 +83,7 @@ fun UserList (
     else ->
       LazyColumn(modifier = Modifier.fillMaxWidth()) {
         itemsIndexed(state.users) { _, user ->
-          UserListItem(user = user, imageLoader = imageLoader)
+          UserListItem(user = user, imageLoader = imageLoader, onNavigationEvent = onNavigationEvent)
           HorizontalDivider(
             modifier = Modifier.padding(start = 76.dp),
             color = MaterialTheme.colorScheme.outlineVariant
@@ -97,7 +97,7 @@ fun UserList (
 fun UserListItem(
   user: UserModel,
   imageLoader: ImageLoader,
-  navigationViewModel: NavigationViewModel = hiltViewModel()
+  onNavigationEvent: (NavEvent) -> Unit
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
@@ -106,7 +106,7 @@ fun UserListItem(
       .padding(horizontal = 16.dp, vertical = 12.dp)
       .clickable(
         onClick = {
-          navigationViewModel.onEvent(
+          onNavigationEvent(
             NavEvent.OnNavigateTo(
               Route.User(userId = user.id)
             )
