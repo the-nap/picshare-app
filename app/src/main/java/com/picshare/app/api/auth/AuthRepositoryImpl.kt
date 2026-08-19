@@ -1,7 +1,11 @@
 package com.picshare.app.api.auth
 
+import android.app.Activity
 import android.app.Application
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.net.toUri
 import com.picshare.app.BuildConfig
 import com.picshare.app.BuildConfig.CLIENT_ID
@@ -24,6 +28,7 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
   private val issuerUri = "${BuildConfig.AUTH_URL}/realms/${BuildConfig.REALM}".toUri()
+  private val TAG = this.javaClass.simpleName
 
   override var currentUserId: String? = null
 
@@ -31,8 +36,10 @@ class AuthRepositoryImpl @Inject constructor(
   override suspend fun getAuthorizationRequest(): Intent {
     val serviceConfig = discoverEndpoints()
     val authRequest = createAuthRequest(serviceConfig)
+    Log.d("AuthRepo", "AuthRequest: $authRequest")
 
     val authService = AuthorizationService(appContext)
+    Log.d("AuthRepo", "AuthService: $authService")
     return authService.getAuthorizationRequestIntent(authRequest)
   }
 
@@ -47,21 +54,24 @@ class AuthRepositoryImpl @Inject constructor(
     .build()
 
   private suspend fun discoverEndpoints(): AuthorizationServiceConfiguration {
+    Log.d("AuthRepo", "discoverEndpoints: starting fetch for $issuerUri")
     return suspendCancellableCoroutine { cont ->
       AuthorizationServiceConfiguration.fetchFromIssuer(issuerUri) { config, ex ->
+        Log.d("AuthRepo", "discoverEndpoints: callback fired, config=$config ex=$ex")
         if (config != null) cont.resume(config)
         else cont.resumeWithException(ex ?: Exception("Discovery failed"))
       }
     }
   }
 
-  override suspend fun handleAuthResponse(data: Intent?) {
+  override suspend fun handleAuthResponse(data: Intent?): Boolean {
     requireNotNull(data)
     val response = AuthorizationResponse.fromIntent(data)
     val exception = AuthorizationException.fromIntent(data)
 
     if(response == null){
-      throw exception ?: Exception("Authorization failed")
+      Log.e("AuthRepo", "Authorization Failed", exception)
+      return false
     }
 
     val newAuthState = getTokenFromCode(response)
@@ -69,10 +79,12 @@ class AuthRepositoryImpl @Inject constructor(
     currentUserId = extractUserId(newAuthState)
 
     TokenStorage.save(appContext, newAuthState)
+
+    return true
   }
 
-  private fun extractUserId(authState: AuthState): String? =
-    authState.parsedIdToken?.subject
+  private fun extractUserId(authState: AuthState): String =
+    authState.parsedIdToken?.subject!!.split(":")[2]
 
   private suspend fun getTokenFromCode(response: AuthorizationResponse): AuthState {
     return suspendCancellableCoroutine { cont ->
@@ -95,16 +107,9 @@ class AuthRepositoryImpl @Inject constructor(
     }
   }
 
-  override suspend fun getValidAccessToken(): String {
+  override suspend fun getValidAccessToken(): String? {
+    val authState = TokenStorage.load(appContext) ?: return null
     return suspendCancellableCoroutine { cont ->
-      val authState = TokenStorage.load(appContext)
-
-      if(authState == null){
-        cont.resumeWithException(
-          Exception("Not authenticated")
-        )
-        return@suspendCancellableCoroutine
-      }
 
       val authService = AuthorizationService(appContext)
       authState.performActionWithFreshTokens(authService){ accessToken, _, ex ->
@@ -123,25 +128,28 @@ class AuthRepositoryImpl @Inject constructor(
     }
   }
 
-  override suspend fun logout() {
+  override suspend fun logout(context: Context, data: Intent) {
     val authState = TokenStorage.load(appContext) ?: return
     val authService = AuthorizationService(appContext)
 
     val serviceConfig = authState.authorizationServiceConfiguration
+
     val idToken = authState.idToken
 
     TokenStorage.clear(appContext)
 
     if(serviceConfig != null && idToken != null){
+      currentUserId = null
       val endSessionRequest = EndSessionRequest.Builder(serviceConfig)
         .setIdTokenHint(idToken)
         .setPostLogoutRedirectUri(
           "com.picshare.app:/oauth2redirect".toUri()
         )
         .build()
-
-      val endSessionIntent = authService.getEndSessionRequestIntent(endSessionRequest)
-      appContext.startActivity(endSessionIntent)
+      authService.performEndSessionRequest(
+        endSessionRequest,
+        PendingIntent.getActivity(context, 0, data, PendingIntent.FLAG_IMMUTABLE)
+      )
     }
     authService.dispose()
   }

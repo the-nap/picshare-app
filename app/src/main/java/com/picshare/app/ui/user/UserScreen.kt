@@ -2,6 +2,7 @@ package com.picshare.app.ui.user
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,17 +51,9 @@ fun UserScreen(
 ) {
 
   val state by viewModel.uiState.collectAsState()
-  val context = LocalContext.current
 
   LaunchedEffect(user) {
     viewModel.set(user)
-  }
-
-  LaunchedEffect(Unit) {
-    viewModel.logoutEvent.collect{
-      context.startActivity(Intent(context, LoginActivity::class.java))
-      (context as? Activity)?.finish()
-    }
   }
 
   when {
@@ -79,6 +72,7 @@ fun UserScreen(
 
     else -> {
       val user = state.user!!
+      Log.d("UserScreen", user.toString())
       Column(
         modifier = Modifier
           .fillMaxWidth()
@@ -109,7 +103,7 @@ fun UserScreen(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
               )
-              if (user.bio.isNotBlank()) {
+              if (user.bio != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                   text = user.bio,

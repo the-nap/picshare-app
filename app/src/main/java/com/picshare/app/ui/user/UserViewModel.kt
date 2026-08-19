@@ -1,5 +1,8 @@
 package com.picshare.app.ui.user
 
+import android.content.Context
+import android.content.Intent
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
@@ -7,7 +10,9 @@ import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.data.model.UserModel
 import com.picshare.app.data.repository.UserRepository
+import com.picshare.app.ui.LoginActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -20,7 +25,8 @@ import javax.inject.Inject
 class UserViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val authRepository: AuthRepository,
-  val imageLoader: ImageLoader
+  val imageLoader: ImageLoader,
+  @ApplicationContext private val context: Context
 ): ViewModel(){
 
   private val TAG = this.javaClass.simpleName
@@ -72,12 +78,11 @@ class UserViewModel @Inject constructor(
     }
   }
 
-  private val _logoutEvent = MutableSharedFlow<Unit>()
-  val logoutEvent = _logoutEvent.asSharedFlow()
   fun logout(){
     viewModelScope.launch{
-      authRepository.logout()
-      _logoutEvent.emit(Unit)
+      authRepository.logout(
+        context,
+        Intent(context, LoginActivity::class.java))
     }
   }
   private fun getThisUser(){
@@ -87,7 +92,7 @@ class UserViewModel @Inject constructor(
       _uiState.update {
         it.copy( isLoading = true )
       }
-      when(val result = userRepository.getUser(authRepository.currentUserId!!.split(":")[2])){
+      when(val result = userRepository.getUser(authRepository.currentUserId!!)){
         is NetworkResult.Success ->{
           _uiState.update {
             it.copy(

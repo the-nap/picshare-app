@@ -1,5 +1,6 @@
 package com.picshare.app.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -56,8 +57,21 @@ class LoginActivity : ComponentActivity() {
   ) { result ->
     lifecycleScope.launch {
       try{
-        authRepository.handleAuthResponse(result.data)
-        goToMainActivity()
+        Log.d(TAG, "resultCode=${result.resultCode}")
+        Log.d(TAG, "data=${result.data}")
+        Log.d(TAG, "data?.data(uri)=${result.data?.data}")
+        Log.d(TAG, "extras keys=${result.data?.extras?.keySet()?.joinToString()}")
+
+        if (result.resultCode != Activity.RESULT_OK) {
+          Log.e(TAG, "Auth canceled/failed before repository handling")
+          return@launch
+        }
+        val success = authRepository.handleAuthResponse(result.data)
+        if(success)
+          goToMainActivity()
+        else {
+          Log.e(TAG, "OAuth authentication failed")
+        }
       } catch(e: Exception){
         Log.e(TAG, "Error in authLauncher()", e)
       }
@@ -92,7 +106,9 @@ class LoginActivity : ComponentActivity() {
   private fun startLogin() {
     lifecycleScope.launch {
       try {
+        Log.d(TAG, "AuthLauncher: $authLauncher")
         authLauncher.launch(authRepository.getAuthorizationRequest())
+        Log.d(TAG, "AuthLauncher: All good")
       } catch (e: Exception) {
         Log.e(TAG, "Error in startLogin()", e)
       }
