@@ -38,8 +38,6 @@ class UserViewModel @Inject constructor(
       getThisUser()
     else {
       fetchUser(userId)
-      assignButton()
-
     }
   }
 
@@ -52,6 +50,7 @@ class UserViewModel @Inject constructor(
               user = result.data,
               isLoading = false
             ) }
+          assignButton()
         }
         is NetworkResult.Error -> {
           _uiState.update {

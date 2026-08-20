@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.ImageLoader
-import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
 import com.picshare.app.ui.theme.PicshareTheme
@@ -85,7 +90,7 @@ private fun PostContent(
     Card(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(20.dp),
+        .padding(5.dp),
       shape = RoundedCornerShape(16.dp),
       colors = CardDefaults.cardColors(
         containerColor = MaterialTheme.colorScheme.surface
@@ -103,10 +108,11 @@ private fun PostContent(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-          AsyncImage(
+          SubcomposeAsyncImage(
             imageLoader = imageLoader,
             model = avatarUrl ?: R.drawable.default_avatar,
             contentDescription = "User avatar",
+            loading = {CircularProgressIndicator(modifier = Modifier.size(50.dp))},
             modifier = Modifier
               .size(40.dp)
               .clip(CircleShape),
@@ -118,13 +124,20 @@ private fun PostContent(
             color = MaterialTheme.colorScheme.onSurface
           )
         }
-        AsyncImage(
+        var aspectRatio by remember { mutableFloatStateOf(1f) }
+        SubcomposeAsyncImage (
           imageLoader = imageLoader,
           model = imageUrl ?: R.drawable.default_image,
+          loading = { CircularProgressIndicator(modifier = Modifier.size(50.dp)) },
+          onSuccess = { state ->
+            val size = state.result.image
+            aspectRatio = size.width.toFloat() / size.height.toFloat()
+          },
           contentDescription = "image",
           modifier = Modifier
             .fillMaxWidth()
-            .heightIn(max = 600.dp),
+            .heightIn(max = 900.dp)
+            .aspectRatio(aspectRatio),
           contentScale = ContentScale.Fit
         )
         Column(
@@ -184,34 +197,5 @@ private fun PostContent(
         Text("Delete")
       }
     }
-  }
-}
-
-@Preview(
-  name = "Post Content",
-  showBackground = true,
-  backgroundColor = 0xFF121316
-)
-@Composable
-private fun PostContentPreview() {
-  val context = LocalContext.current
-
-  val imageLoader = ImageLoader.Builder(context)
-    .build()
-
-  PicshareTheme {
-    PostContent(
-      username = "leonardo",
-      avatarUrl = null,
-      imageUrl = null,
-      description = "A beautiful day at the beach 🌊",
-      tags = "#beach #summer #italy",
-      likes = 42,
-      likeIcon = CssGgIcons.Heart,
-      onLikeClick = {},
-      showDeleteButton = true,
-      onDeleteClick = {},
-      imageLoader = imageLoader
-    )
   }
 }
