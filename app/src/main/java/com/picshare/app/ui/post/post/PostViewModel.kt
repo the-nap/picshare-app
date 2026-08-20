@@ -35,6 +35,26 @@ class PostViewModel @Inject constructor(
   private val _buttonState = MutableStateFlow(ButtonState())
   val buttonState = _buttonState.asStateFlow()
 
+  private val _showDeleteDialog = MutableStateFlow(false)
+  val showDeleteDialog = _showDeleteDialog.asStateFlow()
+
+  fun showDeleteDialog() {
+    _showDeleteDialog.value = true
+  }
+
+  fun hideDeleteDialog() {
+    _showDeleteDialog.value = false
+  }
+
+  fun confirmDelete() {
+    _showDeleteDialog.value = false
+    viewModelScope.launch {
+      when (val result =  postRepository.delete(uiState.value.post!!.id)){
+        is NetworkResult.Success -> _uiState.update { it.copy( isDeleted = true ) }
+        is NetworkResult.Error -> {}
+      }
+    }
+    }
   fun addLike(){
     viewModelScope.launch {
       when (val result = postRepository.like(uiState.value.post!!.id)) {

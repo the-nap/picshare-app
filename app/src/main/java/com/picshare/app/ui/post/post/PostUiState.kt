@@ -8,6 +8,7 @@ data class PostUiState(
   val user: UserModel? = null,
   val likes: Number = 0,
   val isLiked: Boolean = false,
+  val isDeleted: Boolean = false,
   val isOwned: Boolean = false,
   val isLoading: Boolean = false,
   val error: String? = null

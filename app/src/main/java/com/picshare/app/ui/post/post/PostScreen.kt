@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -35,12 +36,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.ImageLoader
 import coil3.compose.SubcomposeAsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
 import com.picshare.app.ui.navigation.NavEvent
 import com.picshare.app.ui.navigation.Route
+import com.picshare.app.ui.theme.ButtonState
+import com.picshare.app.ui.theme.ConfirmDialog
 import compose.icons.CssGgIcons
 import compose.icons.cssggicons.Heart
 
@@ -58,6 +62,7 @@ fun PostScreen(
 
   val state by viewModel.uiState.collectAsStateWithLifecycle()
   val buttonState by viewModel.buttonState.collectAsStateWithLifecycle()
+  val dialogState by viewModel.showDeleteDialog.collectAsStateWithLifecycle()
 
   PostContent(
     username = state.user?.username,
@@ -69,9 +74,12 @@ fun PostScreen(
     likes = state.post?.likesNumber,
     likeButton = buttonState,
     showDeleteButton = state.isOwned,
-    onDeleteClick = {println("test2")},
+    onDeleteClick = {viewModel.showDeleteDialog()},
     imageLoader = imageLoader,
-    onNavigationEvent = onNavigationEvent
+    onNavigationEvent = onNavigationEvent,
+    showDeleteDialog = dialogState,
+    onConfirm = {viewModel.confirmDelete()},
+    onDismiss = {viewModel.hideDeleteDialog()}
   )
 }
 @Composable
@@ -87,8 +95,20 @@ private fun PostContent(
   showDeleteButton: Boolean,
   onDeleteClick: () -> Unit,
   imageLoader: ImageLoader,
-  onNavigationEvent: (NavEvent) -> Unit
+  onNavigationEvent: (NavEvent) -> Unit,
+  showDeleteDialog: Boolean,
+  onConfirm: () -> Unit,
+  onDismiss: () -> Unit
 ) {
+  if(showDeleteDialog){
+    ConfirmDialog(
+      dialogTitle = "Delete post",
+      dialogText = "This post and all its data will be lost",
+      onConfirmation = onConfirm,
+      onDismissRequest = onDismiss,
+      onConfirmMessage = "Post Deleted"
+    )
+  }
   Column(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
