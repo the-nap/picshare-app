@@ -54,11 +54,13 @@ class PostViewModel @Inject constructor(
         is NetworkResult.Error -> Log.e(TAG, result.message)
       }
     }
-    }
+  }
+
   fun addLike(){
     viewModelScope.launch {
+      val post = uiState.value.post ?: return@launch
       _buttonState.update { it.copy(isLoading = true) }
-      when (val result = postRepository.like(uiState.value.post!!.id)) {
+      when (val result = postRepository.like(post.id)) {
         is NetworkResult.Success -> _buttonState.update { it.copy( likesNumber = it.likesNumber + 1, isLiked = true ) }
         is NetworkResult.Error -> Log.e(TAG, "Failed to add like: ${result.message}")
       }
@@ -68,8 +70,9 @@ class PostViewModel @Inject constructor(
 
   fun removeLike(){
     viewModelScope.launch {
+      val post = uiState.value.post ?: return@launch
       _buttonState.update { it.copy(isLoading = true) }
-      when (val result = postRepository.like(uiState.value.post!!.id)) {
+      when (val result = postRepository.like(post.id)) {
         is NetworkResult.Success -> _buttonState.update { it.copy( likesNumber = it.likesNumber - 1, isLiked = false ) }
         is NetworkResult.Error -> Log.e(TAG, "Failed to remove like: ${result.message}")
       }
@@ -99,6 +102,7 @@ class PostViewModel @Inject constructor(
                 post = post,
               )
             }
+            _buttonState.update { it.copy(likesNumber = post.likesNumber.toInt()) }
             fetchUser(post.userId)
           }
           is NetworkResult.Error -> _uiState.update { it.copy(error = result.message) }
