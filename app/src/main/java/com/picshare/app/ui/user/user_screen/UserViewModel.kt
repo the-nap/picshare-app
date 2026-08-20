@@ -2,6 +2,7 @@ package com.picshare.app.ui.user.user_screen
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.material3.Text
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
@@ -9,6 +10,7 @@ import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.data.repository.UserRepository
 import com.picshare.app.ui.LoginActivity
+import com.picshare.app.ui.theme.ButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +32,7 @@ class UserViewModel @Inject constructor(
   private val _uiState = MutableStateFlow(UserUiState())
   val uiState = _uiState.asStateFlow()
 
-  private val _buttonState = MutableStateFlow(ButtonState(onClick = { logout() }, text = "Log Out"))
+  private val _buttonState = MutableStateFlow(ButtonState(onClick = { logout() }, aspect = { Text("Log Out") } ))
   val buttonState = _buttonState.asStateFlow()
 
   fun set(userId: String?){
@@ -69,12 +71,12 @@ class UserViewModel @Inject constructor(
         is NetworkResult.Success -> {
           if(result.data)
             _buttonState.update { it.copy(
-              text = "Unfollow",
+              aspect = { Text("Unfollow") },
               onClick = { unfollow() }
             ) }
           else
             _buttonState.update { it.copy(
-              text = "Follow",
+              aspect = { Text("Follow") },
               onClick = { follow() }
             ) }
         }
@@ -120,7 +122,7 @@ class UserViewModel @Inject constructor(
             _buttonState.update {
               it.copy(
                 onClick = { logout() },
-                text = "Log Out",
+                aspect = {Text("Unfollow")},
               )
             }
           }

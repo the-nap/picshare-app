@@ -135,9 +135,7 @@ fun UserScreen(
                 contentColor = MaterialTheme.colorScheme.onPrimary
               )
             ) {
-              Text(
-                text = button.text
-              )
+              button.aspect
             }
           }
         }
