@@ -13,6 +13,7 @@ import com.picshare.app.ui.LoginActivity
 import com.picshare.app.ui.theme.ButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -32,74 +33,109 @@ class UserViewModel @Inject constructor(
   private val _uiState = MutableStateFlow(UserUiState())
   val uiState = _uiState.asStateFlow()
 
-  private val _buttonState = MutableStateFlow(ButtonState(onClick = { logout() }, text = "Log Out") )
+  private val _buttonState = MutableStateFlow(ButtonState(text = "") )
   val buttonState = _buttonState.asStateFlow()
 
-  fun set(userId: String?){
-    if(userId == null || userId ==authRepository.currentUserId)
+  init {
+    _buttonState.update { it.copy(onClick = ::onClick) }
+  }
+
+  fun set(userId: String?) {
+    Log.d(TAG, "set() called with userId: $userId")
+    _uiState.update {
+      it.copy(
+        user = null,
+        error = null,
+        isFollowed = null,
+        isMe = false,
+        isLoading = true
+      )
+    }
+
+    if (userId == null || userId == authRepository.currentUserId) {
       getThisUser()
-    else {
+      _buttonState.update { it.copy(text = "Log Out") }
+    } else {
       fetchUser(userId)
     }
   }
 
-  fun fetchUser(id: String){
+  fun fetchUser(id: String) {
+    Log.d(TAG, "fetchUser() called with id: $id")
     viewModelScope.launch {
       _uiState.update { it.copy(isLoading = true) }
-      when(val result = userRepository.getUser(id)){
+
+      val userDeferred = async { userRepository.getUser(id) }
+      val followsDeferred = async { userRepository.follows(id) }
+
+      when (val result = userDeferred.await()) {
         is NetworkResult.Success -> {
-            _uiState.update { it.copy(
-              user = result.data,
-            ) }
-          assignButton()
+          Log.d(TAG, "fetchUser: Successfully fetched user: ${result.data}")
+          _uiState.update { it.copy(user = result.data, isMe = false) }
         }
         is NetworkResult.Error -> {
-          Log.e(TAG, result.message)
-          _uiState.update {
-            it.copy(
-              error = result.message,
-            )
-          }
+          Log.e(TAG, "fetchUser: Error fetching user: ${result.message}")
+          _uiState.update { it.copy(error = result.message) }
         }
       }
+
+      when (val result = followsDeferred.await()) {
+        is NetworkResult.Success -> {
+          Log.d(TAG, "fetchUser: Successfully fetched follows status: ${result.data}")
+          _uiState.update { it.copy(isFollowed = result.data) }
+          _buttonState.update { it.copy(text = if (result.data) "Unfollow" else "Follow") }
+        }
+        is NetworkResult.Error -> {
+          Log.e(TAG, "fetchUser: Error fetching follows status: ${result.message}")
+          _uiState.update { it.copy(error = result.message) }
+        }
+      }
+
       _uiState.update { it.copy(isLoading = false) }
     }
   }
-  fun assignButton(){
-    viewModelScope.launch {
-      _buttonState.update {it.copy( isLoading = true )}
-      when(val result = userRepository.follows(uiState.value.user!!.id)){
-        is NetworkResult.Success -> {
-          if(result.data)
-            _buttonState.update { it.copy(
-              text = "Unfollow",
-              onClick = { unfollow() }
-            ) }
-          else
-            _buttonState.update { it.copy(
-              text = "Follow",
-              onClick = { follow() }
-            ) }
-          _buttonState.update {it.copy( isLoading = false )}
-        }
-        is NetworkResult.Error -> {}
-      }
-      _buttonState.update {it.copy( isLoading = false )}
-    }
+
+  private fun onClick() {
+    if(buttonState.value.isLoading) return
+    if (uiState.value.isMe) logout()
+    else if (uiState.value.isFollowed == true) unfollow() else follow()
   }
 
   fun follow(){
     viewModelScope.launch {
-      userRepository.follow(uiState.value.user!!.id)
+      val user = uiState.value.user ?: return@launch
+      Log.d(TAG, "follow() called for user id: ${user.id}")
+      _buttonState.update{it.copy(isLoading = true)}
+      when (val result = userRepository.follow(user.id)){
+        is NetworkResult.Success -> {
+          Log.d(TAG, "follow: Successfully followed user ${user.id}")
+          _uiState.update { it.copy(isFollowed = true) }
+          _buttonState.update { it.copy(text = "Unfollow") }
+        }
+        is NetworkResult.Error -> Log.e(TAG, "follow: Error following user ${user.id}: ${result.message}")
+      }
+      _buttonState.update{it.copy(isLoading = false)}
     }
   }
   fun unfollow(){
     viewModelScope.launch {
-      userRepository.unfollow(uiState.value.user!!.id)
+      val user = uiState.value.user ?: return@launch
+      Log.d(TAG, "unfollow() called for user id: ${user.id}")
+      _buttonState.update{it.copy(isLoading = true)}
+      when (val result = userRepository.unfollow(user.id)){
+        is NetworkResult.Success -> {
+          Log.d(TAG, "unfollow: Successfully unfollowed user ${user.id}")
+          _uiState.update { it.copy(isFollowed = false) }
+          _buttonState.update { it.copy(text = "Follow") }
+        }
+        is NetworkResult.Error -> Log.e(TAG, "unfollow: Error unfollowing user ${user.id}: ${result.message}")
+      }
+      _buttonState.update{it.copy(isLoading = false)}
     }
   }
 
   fun logout(){
+    Log.d(TAG, "logout() called")
     viewModelScope.launch{
       authRepository.logout(
         context,
@@ -107,34 +143,39 @@ class UserViewModel @Inject constructor(
     }
   }
   private fun getThisUser(){
-    if(authRepository.currentUserId == null)
+    val currentUserId = authRepository.currentUserId
+    Log.d(TAG, "getThisUser() called, currentUserId: $currentUserId")
+    if(currentUserId == null)
       return
     viewModelScope.launch{
       _uiState.update {
         it.copy( isLoading = true )
       }
-      when(val result = userRepository.getUser(authRepository.currentUserId!!)){
+      when(val result = userRepository.getUser(currentUserId)){
         is NetworkResult.Success ->{
+          Log.d(TAG, "getThisUser: Successfully fetched current user: ${result.data}")
           _uiState.update {
             it.copy(
               user = result.data,
-              isLoading = false
+              isLoading = false,
+              isMe = true,
             )
           }
             _buttonState.update {
               it.copy(
-                onClick = { logout() },
                 text = "Log Out"
               )
             }
           }
-        is NetworkResult.Error ->
+        is NetworkResult.Error -> {
+          Log.e(TAG, "getThisUser: Error fetching current user: ${result.message}")
           _uiState.update {
             it.copy(
               error = result.message,
               isLoading = false
             )
           }
+        }
       }
     }
   }

@@ -50,10 +50,10 @@ interface PicshareApi {
   suspend fun follows(@Query("followed") user: String): Boolean
 
   @POST("user/follow")
-  suspend fun follow(@Body toFollow: String): String
+  suspend fun follow(@Body body: Map<String, String>)
 
   @POST("user/unfollow")
-  suspend fun unfollow(@Body toFollow: String): String
+  suspend fun unfollow(@Body body: Map<String, String>)
 
   @GET("user/contains")
   suspend fun contains(@Query("toSearch") toSearch: String, @Query("offset") offset: Number, @Query("max") max: Number): List<UserModel>

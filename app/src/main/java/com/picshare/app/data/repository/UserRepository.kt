@@ -38,15 +38,15 @@ class UserRepository (
     }
   }
 
-  suspend fun follow(id: String): NetworkResult<String>{
+  suspend fun follow(id: String): NetworkResult<Unit>{
     return handleRequest(dispatcher){
-      dataSource.follow(id)
+      dataSource.follow(mapOf("toFollow" to id))
     }
   }
 
-  suspend fun unfollow(id: String): NetworkResult<String>{
+  suspend fun unfollow(id: String): NetworkResult<Unit>{
     return handleRequest(dispatcher){
-      dataSource.unfollow(id)
+      dataSource.unfollow(mapOf("toUnfollow" to id))
     }
   }
 }
