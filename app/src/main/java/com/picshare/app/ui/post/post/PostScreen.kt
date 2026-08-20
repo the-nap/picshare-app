@@ -57,6 +57,7 @@ fun PostScreen(
   }
 
   val state by viewModel.uiState.collectAsStateWithLifecycle()
+  val buttonState by viewModel.buttonState.collectAsStateWithLifecycle()
 
   PostContent(
     username = state.user?.username,
@@ -66,7 +67,7 @@ fun PostScreen(
     description = state.post?.description,
     tags = state.post?.tags,
     likes = state.post?.likesNumber,
-    onLikeClick = {println("test")},
+    likeButton = buttonState,
     showDeleteButton = state.isOwned,
     onDeleteClick = {println("test2")},
     imageLoader = imageLoader,
@@ -82,8 +83,7 @@ private fun PostContent(
   description: String?,
   tags: String?,
   likes: Number?,
-  likeIcon: ImageVector = CssGgIcons.Heart,
-  onLikeClick: () -> Unit,
+  likeButton: ButtonState,
   showDeleteButton: Boolean,
   onDeleteClick: () -> Unit,
   imageLoader: ImageLoader,
@@ -160,13 +160,9 @@ private fun PostContent(
               horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
               IconButton(
-                onClick = onLikeClick,
-              ) {
-                Icon(
-                  imageVector = likeIcon,
-                  contentDescription = "Like"
-                )
-              }
+                onClick = likeButton.onClick,
+                content = likeButton.aspect
+              )
 
               Text(
                 text = "${likes ?: 0}",
