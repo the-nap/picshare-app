@@ -1,6 +1,7 @@
 package com.picshare.app.ui.post.post
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,8 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,7 +39,8 @@ import coil3.ImageLoader
 import coil3.compose.SubcomposeAsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
-import com.picshare.app.ui.theme.PicshareTheme
+import com.picshare.app.ui.navigation.NavEvent
+import com.picshare.app.ui.navigation.Route
 import compose.icons.CssGgIcons
 import compose.icons.cssggicons.Heart
 
@@ -48,7 +48,8 @@ import compose.icons.cssggicons.Heart
 fun PostScreen(
   postId: String,
   viewModel: PostViewModel = hiltViewModel(),
-  imageLoader: ImageLoader = viewModel.imageLoader
+  imageLoader: ImageLoader = viewModel.imageLoader,
+  onNavigationEvent: (NavEvent) -> Unit
 ) {
 
   LaunchedEffect(postId) {
@@ -59,6 +60,7 @@ fun PostScreen(
 
   PostContent(
     username = state.user?.username,
+    userId = state.user?.id,
     avatarUrl = "${BuildConfig.AVATAR_URL}/${state.user?.id}",
     imageUrl = "${BuildConfig.MEDIA_URL}/${state.post?.id}",
     description = state.post?.description,
@@ -67,12 +69,14 @@ fun PostScreen(
     onLikeClick = {println("test")},
     showDeleteButton = state.isOwned,
     onDeleteClick = {println("test2")},
-    imageLoader = imageLoader
+    imageLoader = imageLoader,
+    onNavigationEvent = onNavigationEvent
   )
 }
 @Composable
 private fun PostContent(
   username: String?,
+  userId: String?,
   avatarUrl: String?,
   imageUrl: String?,
   description: String?,
@@ -82,8 +86,9 @@ private fun PostContent(
   onLikeClick: () -> Unit,
   showDeleteButton: Boolean,
   onDeleteClick: () -> Unit,
-  imageLoader: ImageLoader
-  ) {
+  imageLoader: ImageLoader,
+  onNavigationEvent: (NavEvent) -> Unit
+) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -104,6 +109,13 @@ private fun PostContent(
             .padding(
               horizontal = 16.dp,
               vertical = 12.dp
+            )
+            .clickable(
+              onClick = {
+                onNavigationEvent(
+                  NavEvent.OnNavigateTo(Route.User(userId = userId))
+                )
+              }
             ),
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(20.dp)

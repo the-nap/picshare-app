@@ -42,6 +42,6 @@ fun AppNavHost(
         UserScreen(onNavigationEvent = navigationViewModel::onEvent, userId = route.userId) }
       dialog<Route.Post> { backStackEntry ->
         val route = backStackEntry.toRoute<Route.Post>()
-        PostScreen(postId = route.postId) }
+        PostScreen(postId = route.postId, onNavigationEvent = navigationViewModel::onEvent) }
   }
 }

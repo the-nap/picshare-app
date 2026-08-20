@@ -48,6 +48,7 @@ class PostViewModel @Inject constructor(
       }
     }
   }
+  //ToDo("add like and delete")
 
   private suspend fun fetchUser(userId: String){
     when (val userResult = userRepository.getUser(userId)) {
