@@ -1,18 +1,14 @@
 package com.picshare.app.ui.post.post
 
 import android.util.Log
-import androidx.compose.material3.Icon
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
-import com.picshare.app.R
 import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
-import com.picshare.app.ui.theme.ButtonState
+import com.picshare.app.ui.theme.LikeButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,11 +28,15 @@ class PostViewModel @Inject constructor(
   private val _uiState = MutableStateFlow(PostUiState())
   val uiState = _uiState.asStateFlow()
 
-  private val _buttonState = MutableStateFlow(ButtonState())
+  private val _buttonState = MutableStateFlow(LikeButtonState())
   val buttonState = _buttonState.asStateFlow()
 
   private val _showDeleteDialog = MutableStateFlow(false)
   val showDeleteDialog = _showDeleteDialog.asStateFlow()
+
+  init {
+    _buttonState.update { it.copy(onClick = ::onLikeClick) }
+  }
 
   fun showDeleteDialog() {
     _showDeleteDialog.value = true
@@ -51,60 +51,42 @@ class PostViewModel @Inject constructor(
     viewModelScope.launch {
       when (val result =  postRepository.delete(uiState.value.post!!.id)){
         is NetworkResult.Success -> _uiState.update { it.copy( isDeleted = true ) }
-        is NetworkResult.Error -> {}
+        is NetworkResult.Error -> Log.e(TAG, result.message)
       }
     }
     }
   fun addLike(){
     viewModelScope.launch {
+      _buttonState.update { it.copy(isLoading = true) }
       when (val result = postRepository.like(uiState.value.post!!.id)) {
-        is NetworkResult.Success -> _uiState.update { it.copy( likes = it.likes.toInt() + 1, isLiked = true ) }
-        is NetworkResult.Error -> _uiState.update { it.copy( error = result.message) }
+        is NetworkResult.Success -> _buttonState.update { it.copy( likesNumber = it.likesNumber + 1, isLiked = true ) }
+        is NetworkResult.Error -> Log.e(TAG, "Failed to add like: ${result.message}")
       }
+      _buttonState.update { it.copy(isLoading = false) }
     }
   }
 
   fun removeLike(){
     viewModelScope.launch {
+      _buttonState.update { it.copy(isLoading = true) }
       when (val result = postRepository.like(uiState.value.post!!.id)) {
-        is NetworkResult.Success -> _uiState.update { it.copy( likes = it.likes.toInt() - 1, isLiked = false ) }
-        is NetworkResult.Error -> _uiState.update { it.copy( error = result.message) }
+        is NetworkResult.Success -> _buttonState.update { it.copy( likesNumber = it.likesNumber - 1, isLiked = false ) }
+        is NetworkResult.Error -> Log.e(TAG, "Failed to remove like: ${result.message}")
       }
+      _buttonState.update { it.copy(isLoading = false) }
     }
 
   }
   fun load(postId: String) {
     viewModelScope.launch {
+      _buttonState.update { it.copy(isLoading = true) }
       when (val result = postRepository.isLiked(postId)) {
-        is NetworkResult.Success -> _uiState.update { it.copy(isLiked = true) }
-        else -> {}
+        is NetworkResult.Success -> _buttonState.update {
+          it.copy(isLiked = result.data, onClick = ::onLikeClick)
+        }
+        is NetworkResult.Error -> Log.e(TAG, "Failed to fetch like status: ${result.message}")
       }
-      if (uiState.value.isLiked)
-        _buttonState.update {
-          it.copy(
-            onClick = { removeLike() },
-            aspect = {
-              Icon(
-                painter = painterResource(R.drawable.heart_full),
-                contentDescription = null,
-                tint = Color.Unspecified
-              )
-            }
-          )
-        }
-      else
-        _buttonState.update {
-          it.copy(
-            onClick = { addLike() },
-            aspect = {
-              Icon(
-                painter = painterResource(R.drawable.heart_empty),
-                contentDescription = null,
-                tint = Color.Unspecified
-              )
-            }
-          )
-        }
+      _buttonState.update { it.copy(isLoading = false) }
     }
     viewModelScope.launch {
       _uiState.update { it.copy(isLoading = true) }
@@ -115,19 +97,22 @@ class PostViewModel @Inject constructor(
             _uiState.update {
               it.copy(
                 post = post,
-                likes = post.likesNumber
               )
             }
             fetchUser(post.userId)
           }
           is NetworkResult.Error -> _uiState.update { it.copy(error = result.message) }
         }
-      }finally {
+      } finally {
         _uiState.update { it.copy(isLoading = false) }
       }
     }
   }
-  //ToDo("add like and delete")
+
+  private fun onLikeClick() {
+    if(buttonState.value.isLoading) return
+    if (_buttonState.value.isLiked) removeLike() else addLike()
+  }
 
   private suspend fun fetchUser(userId: String){
     when (val userResult = userRepository.getUser(userId)) {

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -62,7 +63,7 @@ class LoginActivity : ComponentActivity() {
         Log.d(TAG, "data?.data(uri)=${result.data?.data}")
         Log.d(TAG, "extras keys=${result.data?.extras?.keySet()?.joinToString()}")
 
-        if (result.resultCode != Activity.RESULT_OK) {
+        if (result.resultCode != RESULT_OK) {
           Log.e(TAG, "Auth canceled/failed before repository handling")
           return@launch
         }
@@ -111,6 +112,11 @@ class LoginActivity : ComponentActivity() {
         Log.d(TAG, "AuthLauncher: All good")
       } catch (e: Exception) {
         Log.e(TAG, "Error in startLogin()", e)
+        Toast.makeText(
+          this@LoginActivity,
+          "An error occurred while starting login",
+          Toast.LENGTH_LONG)
+          .show()
       }
     }
   }

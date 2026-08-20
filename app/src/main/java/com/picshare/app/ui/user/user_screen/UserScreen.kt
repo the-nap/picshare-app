@@ -1,6 +1,7 @@
 package com.picshare.app.ui.user.user_screen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -65,6 +67,20 @@ fun UserScreen(
         contentAlignment = Alignment.Center
       ) {
         CircularProgressIndicator()
+      }
+    }
+
+    state.error != null -> {
+      Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_LONG).show()
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .background(MaterialTheme.colorScheme.surface)
+          .padding(16.dp)
+          .heightIn(min = 140.dp),
+        contentAlignment = Alignment.Center
+      ) {
+        Text("Something went wrong")
       }
     }
 
@@ -134,8 +150,8 @@ fun UserScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
               )
-            ) {
-              button.aspect
+            ){
+              Text(button.text)
             }
           }
         }

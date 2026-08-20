@@ -6,8 +6,6 @@ import com.picshare.app.data.model.UserModel
 data class PostUiState(
   val post: PostModel? = null,
   val user: UserModel? = null,
-  val likes: Number = 0,
-  val isLiked: Boolean = false,
   val isDeleted: Boolean = false,
   val isOwned: Boolean = false,
   val isLoading: Boolean = false,

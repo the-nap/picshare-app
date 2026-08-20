@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -31,22 +30,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.ImageLoader
 import coil3.compose.SubcomposeAsyncImage
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
 import com.picshare.app.ui.navigation.NavEvent
 import com.picshare.app.ui.navigation.Route
-import com.picshare.app.ui.theme.ButtonState
 import com.picshare.app.ui.theme.ConfirmDialog
-import compose.icons.CssGgIcons
-import compose.icons.cssggicons.Heart
+import com.picshare.app.ui.theme.LikeButtonState
 
 @Composable
 fun PostScreen(
@@ -71,7 +68,6 @@ fun PostScreen(
     imageUrl = "${BuildConfig.MEDIA_URL}/${state.post?.id}",
     description = state.post?.description,
     tags = state.post?.tags,
-    likes = state.post?.likesNumber,
     likeButton = buttonState,
     showDeleteButton = state.isOwned,
     onDeleteClick = {viewModel.showDeleteDialog()},
@@ -90,8 +86,7 @@ private fun PostContent(
   imageUrl: String?,
   description: String?,
   tags: String?,
-  likes: Number?,
-  likeButton: ButtonState,
+  likeButton: LikeButtonState,
   showDeleteButton: Boolean,
   onDeleteClick: () -> Unit,
   imageLoader: ImageLoader,
@@ -181,11 +176,17 @@ private fun PostContent(
             ) {
               IconButton(
                 onClick = likeButton.onClick,
-                content = likeButton.aspect
-              )
+                enabled = !likeButton.isLoading
+              ){
+                Icon(
+                  painter = painterResource((if(likeButton.isLiked) R.drawable.heart_full else R.drawable.heart_empty)),
+                  contentDescription = null,
+                  tint = Color.Unspecified
+                )
+              }
 
               Text(
-                text = "${likes ?: 0}",
+                text = "${likeButton.likesNumber}",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
               )

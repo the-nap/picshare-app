@@ -2,7 +2,7 @@ package com.picshare.app.ui.user.user_screen
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.material3.Text
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
@@ -32,7 +32,7 @@ class UserViewModel @Inject constructor(
   private val _uiState = MutableStateFlow(UserUiState())
   val uiState = _uiState.asStateFlow()
 
-  private val _buttonState = MutableStateFlow(ButtonState(onClick = { logout() }, aspect = { Text("Log Out") } ))
+  private val _buttonState = MutableStateFlow(ButtonState(onClick = { logout() }, text = "Log Out") )
   val buttonState = _buttonState.asStateFlow()
 
   fun set(userId: String?){
@@ -50,39 +50,41 @@ class UserViewModel @Inject constructor(
         is NetworkResult.Success -> {
             _uiState.update { it.copy(
               user = result.data,
-              isLoading = false
             ) }
           assignButton()
         }
         is NetworkResult.Error -> {
+          Log.e(TAG, result.message)
           _uiState.update {
             it.copy(
               error = result.message,
-              isLoading = false
             )
           }
         }
       }
+      _uiState.update { it.copy(isLoading = false) }
     }
   }
   fun assignButton(){
     viewModelScope.launch {
+      _buttonState.update {it.copy( isLoading = true )}
       when(val result = userRepository.follows(uiState.value.user!!.id)){
         is NetworkResult.Success -> {
           if(result.data)
             _buttonState.update { it.copy(
-              aspect = { Text("Unfollow") },
+              text = "Unfollow",
               onClick = { unfollow() }
             ) }
           else
             _buttonState.update { it.copy(
-              aspect = { Text("Follow") },
+              text = "Follow",
               onClick = { follow() }
             ) }
+          _buttonState.update {it.copy( isLoading = false )}
         }
-        is NetworkResult.Error -> return@launch
+        is NetworkResult.Error -> {}
       }
-
+      _buttonState.update {it.copy( isLoading = false )}
     }
   }
 
@@ -122,7 +124,7 @@ class UserViewModel @Inject constructor(
             _buttonState.update {
               it.copy(
                 onClick = { logout() },
-                aspect = {Text("Unfollow")},
+                text = "Log Out"
               )
             }
           }
