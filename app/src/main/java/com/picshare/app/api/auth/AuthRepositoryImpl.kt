@@ -9,6 +9,7 @@ import androidx.core.net.toUri
 import com.picshare.app.BuildConfig
 import com.picshare.app.BuildConfig.CLIENT_ID
 import com.picshare.app.BuildConfig.REDIRECT_URI
+import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.repository.UserRepository
 import com.picshare.app.ui.LoginActivity
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -26,7 +27,8 @@ import kotlin.coroutines.resumeWithException
 
 class AuthRepositoryImpl @Inject constructor(
   private val appContext: Application,
-  private val userRepository: UserRepository
+  private val userRepository: UserRepository,
+  private val tokenProvider: TokenProvider
 ) : AuthRepository {
 
   private val issuerUri = "${BuildConfig.AUTH_URL}/realms/${BuildConfig.REALM}".toUri()
@@ -75,12 +77,18 @@ class AuthRepositoryImpl @Inject constructor(
 
     val newAuthState = getTokenFromCode(response)
 
-    val currentUserId = extractUserId(newAuthState)
-    userRepository.refreshCurrentUser(currentUserId)
-
     TokenStorage.save(appContext, newAuthState)
+    val userId = extractUserId(newAuthState)
+    val result = userRepository.refreshCurrentUser(userId)
+    return result is NetworkResult.Success
+  }
 
-    return true
+  override suspend fun tryRestoreSession(): Boolean {
+    val token = tokenProvider.getValidAccessToken() ?: return false
+    val authState = TokenStorage.load(appContext) ?: return false
+    val userId = extractUserId(authState)
+    val result = userRepository.refreshCurrentUser(userId)
+    return result is NetworkResult.Success
   }
 
   private fun extractUserId(authState: AuthState): String =
@@ -101,27 +109,6 @@ class AuthRepositoryImpl @Inject constructor(
         } else {
           cont.resumeWithException(
             ex ?: Exception("Token exchange failed")
-          )
-        }
-      }
-    }
-  }
-
-  override suspend fun getValidAccessToken(): String? {
-    val authState = TokenStorage.load(appContext) ?: return null
-    return suspendCancellableCoroutine { cont ->
-
-      val authService = AuthorizationService(appContext)
-      authState.performActionWithFreshTokens(authService){ accessToken, _, ex ->
-        authService.dispose()
-
-        if(accessToken != null){
-          TokenStorage.save(appContext, authState)
-          cont.resume(accessToken)
-        } else {
-          TokenStorage.clear(appContext)
-          cont.resumeWithException(
-            ex ?: Exception("Token refresh failed")
           )
         }
       }

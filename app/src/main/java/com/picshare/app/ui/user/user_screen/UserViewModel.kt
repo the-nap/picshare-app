@@ -1,7 +1,6 @@
 package com.picshare.app.ui.user.user_screen
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +8,6 @@ import coil3.ImageLoader
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.data.repository.UserRepository
-import com.picshare.app.ui.LoginActivity
 import com.picshare.app.ui.theme.ButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

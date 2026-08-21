@@ -10,7 +10,7 @@ import com.google.gson.Gson
 import com.picshare.app.BuildConfig
 import com.picshare.app.api.network.PicshareApi
 import com.picshare.app.api.auth.AuthInterceptor
-import com.picshare.app.api.auth.AuthRepository
+import com.picshare.app.api.auth.TokenProvider
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
 import dagger.Module
@@ -60,11 +60,11 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun getClientWithInterceptors(authRepository: AuthRepository): OkHttpClient{
+  fun getClientWithInterceptors(tokenProvider: TokenProvider): OkHttpClient{
     return OkHttpClient.Builder()
       .addInterceptor(AuthInterceptor({
         runBlocking{
-          authRepository.getValidAccessToken()
+          tokenProvider.getValidAccessToken()
         }
       }))
       .build()
@@ -78,8 +78,8 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun provideUserRepository(api: PicshareApi, gson: Gson): UserRepository {
-    return UserRepository(api, gson)
+  fun provideUserRepository(api: PicshareApi, gson: Gson, @ApplicationContext context: Context): UserRepository {
+    return UserRepository(api, gson, context.contentResolver)
   }
 
   @Provides

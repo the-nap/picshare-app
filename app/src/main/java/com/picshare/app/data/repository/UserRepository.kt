@@ -18,8 +18,8 @@ import okio.IOException
 class UserRepository (
   private val dataSource: PicshareApi,
   private val gson: Gson,
+  private val contentResolver: ContentResolver,
   private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-  private val contentResolver: ContentResolver
 ){
 
   private val TAG = this.javaClass.simpleName
