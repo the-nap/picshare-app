@@ -9,6 +9,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -59,8 +60,8 @@ interface PicshareApi {
   suspend fun contains(@Query("toSearch") toSearch: String, @Query("offset") offset: Number, @Query("max") max: Number): List<UserModel>
 
   @Multipart
-  @POST("user/upload")
-  suspend fun uploadUserMedia(@Part data: MultipartBody.Part, @Part("metadata") metadata: RequestBody)
+  @PUT("user/upload")
+  suspend fun uploadUserMedia(@Part("data") data: MultipartBody.Part?, @Part("metadata") metadata: RequestBody?)
 
   @DELETE("user")
   suspend fun deleteUser()
