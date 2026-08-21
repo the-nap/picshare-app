@@ -5,8 +5,6 @@ import android.content.Intent
 
 interface AuthRepository {
 
-  val currentUserId: String?
-
   suspend fun getAuthorizationRequest(): Intent
   suspend fun handleAuthResponse(data: Intent?): Boolean
   suspend fun getValidAccessToken(): String?

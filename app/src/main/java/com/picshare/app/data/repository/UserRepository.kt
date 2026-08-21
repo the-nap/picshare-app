@@ -11,8 +11,24 @@ import kotlinx.coroutines.Dispatchers
 class UserRepository (
   private val dataSource: PicshareApi,
   private val gson: Gson,
-  private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+  private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ){
+  private var cachedUser: UserModel? = null
+
+  val currentUser: UserModel
+    get() = cachedUser
+      ?: error("currentUser accessed before refreshCurrentUser() completed")
+
+  suspend fun refreshCurrentUser(userId: String): NetworkResult<UserModel> {
+    val result = getUser(userId)
+    if (result is NetworkResult.Success) {
+      cachedUser = result.data
+    }
+    return result
+  }
+  fun clear(){
+    cachedUser = null
+  }
 
   suspend fun getUser(id: String): NetworkResult<UserModel> {
     return handleRequest(dispatcher) {

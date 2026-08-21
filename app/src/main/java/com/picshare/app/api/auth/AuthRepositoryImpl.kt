@@ -1,6 +1,5 @@
 package com.picshare.app.api.auth
 
-import android.app.Activity
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
@@ -10,6 +9,7 @@ import androidx.core.net.toUri
 import com.picshare.app.BuildConfig
 import com.picshare.app.BuildConfig.CLIENT_ID
 import com.picshare.app.BuildConfig.REDIRECT_URI
+import com.picshare.app.data.repository.UserRepository
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
@@ -24,14 +24,12 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class AuthRepositoryImpl @Inject constructor(
-  private val appContext: Application
+  private val appContext: Application,
+  private val userRepository: UserRepository
 ) : AuthRepository {
 
   private val issuerUri = "${BuildConfig.AUTH_URL}/realms/${BuildConfig.REALM}".toUri()
   private val TAG = this.javaClass.simpleName
-
-  override var currentUserId: String? = null
-
 
   override suspend fun getAuthorizationRequest(): Intent {
     val serviceConfig = discoverEndpoints()
@@ -76,7 +74,8 @@ class AuthRepositoryImpl @Inject constructor(
 
     val newAuthState = getTokenFromCode(response)
 
-    currentUserId = extractUserId(newAuthState)
+    val currentUserId = extractUserId(newAuthState)
+    userRepository.refreshCurrentUser(currentUserId)
 
     TokenStorage.save(appContext, newAuthState)
 
@@ -139,7 +138,7 @@ class AuthRepositoryImpl @Inject constructor(
     TokenStorage.clear(appContext)
 
     if(serviceConfig != null && idToken != null){
-      currentUserId = null
+      userRepository.clear()
       val endSessionRequest = EndSessionRequest.Builder(serviceConfig)
         .setIdTokenHint(idToken)
         .setPostLogoutRedirectUri(

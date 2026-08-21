@@ -52,7 +52,7 @@ class UserViewModel @Inject constructor(
       )
     }
 
-    if (userId == null || userId == authRepository.currentUserId) {
+    if (userId == null || userId == userRepository.currentUser.id) {
       getThisUser()
       _buttonState.update { it.copy(text = "Log Out") }
     } else {
@@ -143,40 +143,13 @@ class UserViewModel @Inject constructor(
     }
   }
   private fun getThisUser(){
-    val currentUserId = authRepository.currentUserId
-    Log.d(TAG, "getThisUser() called, currentUserId: $currentUserId")
-    if(currentUserId == null)
-      return
-    viewModelScope.launch{
-      _uiState.update {
-        it.copy( isLoading = true )
-      }
-      when(val result = userRepository.getUser(currentUserId)){
-        is NetworkResult.Success ->{
-          Log.d(TAG, "getThisUser: Successfully fetched current user: ${result.data}")
-          _uiState.update {
-            it.copy(
-              user = result.data,
-              isLoading = false,
-              isMe = true,
-            )
-          }
-            _buttonState.update {
-              it.copy(
-                text = "Log Out"
-              )
-            }
-          }
-        is NetworkResult.Error -> {
-          Log.e(TAG, "getThisUser: Error fetching current user: ${result.message}")
-          _uiState.update {
-            it.copy(
-              error = result.message,
-              isLoading = false
-            )
-          }
-        }
-      }
+    val user = userRepository.currentUser
+    _uiState.update {
+      it.copy(
+        user = user,
+        isLoading = false,
+        isMe = true,
+      )
     }
   }
 }

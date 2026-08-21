@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
-import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
@@ -19,7 +18,6 @@ import javax.inject.Inject
 @HiltViewModel
 class PostViewModel @Inject constructor(
   private val userRepository: UserRepository,
-  private val authRepository: AuthRepository,
   private val postRepository: PostRepository,
   val imageLoader: ImageLoader
 ): ViewModel(){
@@ -124,7 +122,7 @@ class PostViewModel @Inject constructor(
         _uiState.update {
           it.copy(
             user = userResult.data,
-            isOwned = userResult.data.id == authRepository.currentUserId,
+            isOwned = userResult.data.id == userRepository.currentUser.id,
           )
         }
       }
