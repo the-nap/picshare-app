@@ -7,6 +7,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
+import coil3.memory.MemoryCache
 import com.picshare.app.BuildConfig
 import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.api.network.Util.NetworkResult
@@ -61,6 +62,9 @@ class SettingsViewModel @Inject constructor(
         newImageUri = uri
       )
     }
+    val state = uiState.value
+    Log.d(TAG, "fromDisk: ${imageLoader.diskCache?.remove(state.user!!.id).toString()}")
+    Log.d(TAG, "fromMemory: ${imageLoader.memoryCache?.remove(MemoryCache.Key(state.user!!.id))}")
   }
   fun onBioChange(bio: String){
     _uiState.update { it.copy(newBio = bio) }
@@ -71,8 +75,10 @@ class SettingsViewModel @Inject constructor(
       _uiState.update { it.copy(isLoading = true) }
       val state = uiState.value
       when(val result = userRepository.upload(state.newImageUri, state.newBio)){
-        is NetworkResult.Success -> {}
-        is NetworkResult.Error -> {}
+        is NetworkResult.Success -> {
+          userRepository.refreshCurrentUser(state.user!!.id)
+        }
+        is NetworkResult.Error -> Log.e(TAG, "error: ${result.message}")
       }
       _uiState.update { it.copy(isLoading = false) }
     }

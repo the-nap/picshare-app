@@ -99,6 +99,7 @@ class LoginActivity : ComponentActivity() {
             try {
               if (authRepository.tryRestoreSession()) {
                 goToMainActivity()
+                finish()
                 return@LaunchedEffect
               }
             } catch (e: Exception) {

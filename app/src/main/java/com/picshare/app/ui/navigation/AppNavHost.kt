@@ -14,6 +14,7 @@ import androidx.navigation.toRoute
 import com.picshare.app.ui.feed.FeedScreen
 import com.picshare.app.ui.post.post.PostScreen
 import com.picshare.app.ui.search.SearchScreen
+import com.picshare.app.ui.user.settings.SettingsScreen
 import com.picshare.app.ui.user.user_screen.UserScreen
 
 @Composable
@@ -37,6 +38,7 @@ fun AppNavHost(
   ){
       composable<Route.Feed> { FeedScreen(onNavigationEvent = navigationViewModel::onEvent) }
       composable<Route.Search> { SearchScreen(onNavigationEvent = navigationViewModel::onEvent) }
+    composable<Route.Settings> { SettingsScreen()}
       composable<Route.User> { backStackEntry ->
         val route = backStackEntry.toRoute<Route.User>()
         UserScreen(onNavigationEvent = navigationViewModel::onEvent, userId = route.userId) }

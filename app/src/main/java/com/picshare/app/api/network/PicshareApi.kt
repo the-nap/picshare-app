@@ -61,7 +61,7 @@ interface PicshareApi {
 
   @Multipart
   @PUT("user/upload")
-  suspend fun uploadUserMedia(@Part("data") data: MultipartBody.Part?, @Part("metadata") metadata: RequestBody?)
+  suspend fun uploadUserMedia(@Part data: MultipartBody.Part?, @Part("metadata") metadata: RequestBody?)
 
   @DELETE("user")
   suspend fun deleteUser()

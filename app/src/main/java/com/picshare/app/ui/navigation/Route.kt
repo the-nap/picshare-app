@@ -13,4 +13,6 @@ sealed interface Route {
 
   @Serializable
   data class Post(val postId: String): Route
+  @Serializable
+  object Settings: Route
 }
