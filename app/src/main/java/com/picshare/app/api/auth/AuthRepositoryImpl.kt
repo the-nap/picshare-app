@@ -10,6 +10,7 @@ import com.picshare.app.BuildConfig
 import com.picshare.app.BuildConfig.CLIENT_ID
 import com.picshare.app.BuildConfig.REDIRECT_URI
 import com.picshare.app.data.repository.UserRepository
+import com.picshare.app.ui.LoginActivity
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
@@ -127,7 +128,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
   }
 
-  override suspend fun logout(context: Context, data: Intent) {
+  override suspend fun logout(context: Context) {
     val authState = TokenStorage.load(appContext) ?: return
     val authService = AuthorizationService(appContext)
 
@@ -147,7 +148,11 @@ class AuthRepositoryImpl @Inject constructor(
         .build()
       authService.performEndSessionRequest(
         endSessionRequest,
-        PendingIntent.getActivity(context, 0, data, PendingIntent.FLAG_IMMUTABLE)
+        PendingIntent.getActivity(
+          context,
+          0,
+          Intent(context, LoginActivity::class.java),
+          PendingIntent.FLAG_IMMUTABLE)
       )
     }
     authService.dispose()

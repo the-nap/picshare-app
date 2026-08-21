@@ -8,6 +8,6 @@ interface AuthRepository {
   suspend fun getAuthorizationRequest(): Intent
   suspend fun handleAuthResponse(data: Intent?): Boolean
   suspend fun getValidAccessToken(): String?
-  suspend fun logout(context: Context, data: Intent)
+  suspend fun logout(context: Context)
 
 }

@@ -137,10 +137,7 @@ class UserViewModel @Inject constructor(
   fun logout(){
     Log.d(TAG, "logout() called")
     viewModelScope.launch{
-      authRepository.logout(
-        context,
-        Intent(context, LoginActivity::class.java))
-    }
+      authRepository.logout(context) }
   }
   private fun getThisUser(){
     val user = userRepository.currentUser
