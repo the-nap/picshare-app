@@ -2,6 +2,7 @@ package com.picshare.app.ui.user.settings
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,45 +30,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
-import com.picshare.app.BuildConfig
-import com.picshare.app.ui.theme.PicshareTheme
+import com.picshare.app.ui.theme.ConfirmDialog
 
 @Composable
 fun SettingsScreen(
+  modifier: Modifier = Modifier,
+  maxBioLength: Int = 140,
   viewModel: SettingsViewModel = hiltViewModel(),
   imageLoader: ImageLoader = viewModel.imageLoader
 ){
 
   val state by viewModel.uiState.collectAsState()
+  val showDeleteDialog by viewModel.showDeleteDialog.collectAsState()
 
-}
-
-@Composable
-fun SettingsContent(
-  profileImageUri: Uri?,
-  onImageSelected: (Uri) -> Unit,
-  fileErrorMessage: String?,
-  bio: String,
-  onBioChange: (String) -> Unit,
-  bioErrorMessage: String?,
-  isSubmitting: Boolean,
-  onSubmit: () -> Unit,
-  isDeleting: Boolean,
-  onDeleteProfile: () -> Unit,
-  modifier: Modifier = Modifier,
-  maxBioLength: Int = 140,
-) {
   val pickImageLauncher = rememberLauncherForActivityResult(
-    contract = ActivityResultContracts.GetContent(),
-  ) { uri -> uri?.let(onImageSelected) }
+    contract = ActivityResultContracts.PickVisualMedia(),
+  ) { uri -> uri?.let{ viewModel.onImageSelected(it) } }
 
+  if(showDeleteDialog){
+    ConfirmDialog(
+      dialogTitle = "Delete ${state.user?.username}'s profile?",
+      dialogText = "This user and all its data will be lost",
+      onConfirmation = {viewModel.confirmDelete()},
+      onDismissRequest = {viewModel.hideDeleteDialog()},
+      onConfirmMessage = "User Deleted"
+    )
+  }
   Column(
     modifier = modifier
       .fillMaxSize()
@@ -83,116 +76,77 @@ fun SettingsContent(
     )
     Spacer(Modifier.height(12.dp))
 
-    if (profileImageUri != null) {
-      val inPreview = LocalInspectionMode.current
-      Box(
-        modifier = Modifier
-          .size(96.dp)
-          .clip(CircleShape)
-          .background(MaterialTheme.colorScheme.surfaceVariant),
-        contentAlignment = Alignment.Center,
-      ) {
-//          AsyncImage(
-//            model = "${BuildConfig.AVATAR_URL}/${user.id}"
-//            contentDescription = "Profile picture preview",
-//            contentScale = ContentScale.Crop,
-//            modifier = Modifier.fillMaxSize(),
-//          )
-//        }
-      }
-      Spacer(Modifier.height(12.dp))
-    }
-
-    OutlinedButton(onClick = { pickImageLauncher.launch("image/*") }) {
-      Text("Choose Photo")
-    }
-
-    if (fileErrorMessage != null) {
-      Text(
-        text = fileErrorMessage,
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.padding(top = 4.dp),
+    Box(
+      modifier = Modifier
+        .size(96.dp)
+        .clip(CircleShape)
+        .background(MaterialTheme.colorScheme.surfaceVariant),
+      contentAlignment = Alignment.Center,
+    ) {
+      AsyncImage(
+        imageLoader = imageLoader,
+        model = viewModel.getImage(),
+        contentDescription = "Profile picture preview",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize(),
       )
     }
+  }
+  Spacer(Modifier.height(12.dp))
 
-    Spacer(Modifier.height(32.dp))
+  OutlinedButton(onClick = { pickImageLauncher.launch(
+    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+  ) }) {
+    Text("Choose Photo")
+  }
 
-    // --- Bio ---
-    OutlinedTextField(
-      value = bio,
-      onValueChange = { if (it.length <= maxBioLength) onBioChange(it) },
-      label = { Text("Add a bio to your profile") },
-      minLines = 5,
-      maxLines = 10,
-      isError = bioErrorMessage != null,
-      supportingText = {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-          Text(bioErrorMessage ?: "")
-          Text("${bio.length}/$maxBioLength")
-        }
-      },
-      modifier = Modifier.fillMaxWidth(),
-    )
+  Spacer(Modifier.height(32.dp))
 
-    Spacer(Modifier.height(16.dp))
-
-    Button(
-      onClick = onSubmit,
-      enabled = !isSubmitting,
-      modifier = Modifier.fillMaxWidth(),
-    ) {
-      if (isSubmitting) {
-        CircularProgressIndicator(
-          modifier = Modifier.size(18.dp),
-          strokeWidth = 2.dp,
-          color = MaterialTheme.colorScheme.onPrimary,
-        )
-      } else {
-        Text("Upload")
+// --- Bio ---
+  val bio = viewModel.getBio() ?: ""
+  OutlinedTextField(
+    value = bio,
+    onValueChange = { if (it.length <= maxBioLength) viewModel.onBioChange(it) },
+    label = { Text("Add a bio to your profile") },
+    minLines = 5,
+    maxLines = 10,
+    supportingText = {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+      ) {
+        Text("${bio.length}/$maxBioLength")
       }
-    }
+    },
+    modifier = Modifier.fillMaxWidth(),
+  )
 
-    Spacer(Modifier.height(32.dp))
+  Spacer(Modifier.height(16.dp))
 
-    // --- Delete ---
-    Button(
-      onClick = onDeleteProfile,
-      enabled = !isDeleting,
-      colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-      modifier = Modifier.fillMaxWidth(),
-    ) {
-      if (isDeleting) {
-        CircularProgressIndicator(
-          modifier = Modifier.size(18.dp),
-          strokeWidth = 2.dp,
-          color = MaterialTheme.colorScheme.onError,
-        )
-      } else {
-        Text("Delete Profile")
-      }
+  Button(
+    onClick = { viewModel.onSubmit() },
+    enabled = !state.isLoading,
+    modifier = Modifier.fillMaxWidth(),
+  ) {
+    if (state.isLoading) {
+      CircularProgressIndicator(
+        modifier = Modifier.size(18.dp),
+        strokeWidth = 2.dp,
+        color = MaterialTheme.colorScheme.onPrimary,
+      )
+    } else {
+      Text("Upload")
     }
   }
-}
 
-@Preview
-@Composable
-private fun SettingsContentPreview() {
-  PicshareTheme {
-    SettingsContent(
-      profileImageUri = Uri.EMPTY, // any non-null value — preview shows a placeholder, not a real image
-      onImageSelected = {},
-      fileErrorMessage = null,
-      bio = "Hello world!",
-      onBioChange = {},
-      bioErrorMessage = null,
-      isSubmitting = false,
-      onSubmit = {},
-      isDeleting = false,
-      onDeleteProfile = {},
-    )
+  Spacer(Modifier.height(32.dp))
+
+// --- Delete ---
+  Button(
+    onClick = {viewModel.showDeleteDialog()},
+    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+    modifier = Modifier.fillMaxWidth(),
+  ) {
+    Text("Delete Profile")
   }
 }
