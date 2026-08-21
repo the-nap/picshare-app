@@ -76,6 +76,12 @@ class UserRepository (
     }
   }
 
+  suspend fun delete(): NetworkResult<Unit>{
+    return handleRequest(dispatcher){
+      dataSource.deleteUser()
+    }
+  }
+
   suspend fun upload(uriImage: Uri?, bio: String?): NetworkResult<Unit> {
     var imagePart: MultipartBody.Part? = null
     if(uriImage != null) {
