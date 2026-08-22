@@ -54,7 +54,8 @@ fun UploadButton(
 }
 @Composable
 fun NavigationFooter(
-  navController: NavController
+  navController: NavController,
+  onNavigationEvent: (NavEvent) -> Unit
 ){
   val navBackStackEntry by navController.currentBackStackEntryAsState()
   val currentDestination = navBackStackEntry?.destination
@@ -64,13 +65,11 @@ fun NavigationFooter(
       NavigationBarItem(
         selected = currentDestination?.route == destination.route::class.qualifiedName,
         onClick = {
-          navController.navigate(route = destination.route) {
-            popUpTo(navController.graph.findStartDestination().id) {
-              saveState = true
-            }
-            launchSingleTop = true
-            restoreState = true
-          }
+          onNavigationEvent(
+            NavEvent.OnNavigateTo(
+              destination.route
+            )
+          )
         },
         icon = { Icon(imageVector = destination.icon, contentDescription = null) },
         label = { Text(destination.label) }

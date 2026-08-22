@@ -13,23 +13,17 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
 import com.picshare.app.ui.feed.FeedScreen
 import com.picshare.app.ui.post.post.PostScreen
+import com.picshare.app.ui.post.upload.PostUploadScreen
 import com.picshare.app.ui.search.SearchScreen
 import com.picshare.app.ui.user.settings.SettingsScreen
 import com.picshare.app.ui.user.user_screen.UserScreen
 
 @Composable
 fun AppNavHost(
-  navController: NavHostController,
   padding: PaddingValues,
-  navigationViewModel: NavigationViewModel = hiltViewModel()
+  navigationViewModel: NavigationViewModel
 ){
 
-  val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-  navigationViewModel.onEvent(
-    NavEvent.OnSetContent(
-      activityNavController = navController,
-    ){ backDispatcher?.onBackPressed() }
-  )
 
   NavHost(
     navController = navigationViewModel.activityNavController,

@@ -10,6 +10,7 @@ sealed interface NavEvent {
   ): NavEvent
 
   data class OnNavigateTo(val destination: Route): NavEvent
+  data class OnNavigateToTab(val destination: Route): NavEvent
 
   data object OnBack: NavEvent
 
