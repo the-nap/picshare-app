@@ -16,5 +16,5 @@ data class UploadFormErrors(
   val description: String? = null,
   val tags: String? = null
 ){
-  val isValid: Boolean get() = file == null && description == null && tags == null
+  val isValid: Boolean get() = file == null && description == null && tags == null && size == null
 }
