@@ -6,11 +6,14 @@ import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
 import com.picshare.app.api.network.Util
 import com.picshare.app.data.repository.PostRepository
+import com.picshare.app.ui.events.AppEvent
+import com.picshare.app.ui.events.EventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GalleryViewModel @Inject constructor (
   private val repository: PostRepository,
+  private val eventBus: EventBus,
   val imageLoader: ImageLoader
 ): ViewModel() {
 
@@ -32,6 +36,13 @@ class GalleryViewModel @Inject constructor (
   private val request = MutableSharedFlow<PostBatchRequest>(extraBufferCapacity = 1)
 
   init {
+    viewModelScope.launch{
+      eventBus.events.filterIsInstance<AppEvent.PostDeleted>().collect{ event ->
+       _uiState.update { state ->
+         state.copy(posts = state.posts.filterNot { it.id == event.postId })
+       }
+      }
+    }
     viewModelScope.launch {
       request
         .onEach { Log.d(TAG, "Request received: $it")}

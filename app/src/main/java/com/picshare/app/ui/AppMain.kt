@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.picshare.app.ui.events.AppEvent
 import com.picshare.app.ui.events.EventBus
 import com.picshare.app.ui.navigation.AppNavHost
 import com.picshare.app.ui.navigation.Header
@@ -19,6 +20,7 @@ import com.picshare.app.ui.navigation.NavigationFooter
 import com.picshare.app.ui.navigation.NavigationViewModel
 import com.picshare.app.ui.navigation.UploadButton
 import com.picshare.app.ui.theme.PicshareTheme
+import kotlinx.coroutines.flow.filterIsInstance
 
 @Composable
 fun AppMain(
@@ -28,8 +30,8 @@ fun AppMain(
 
   val context = LocalContext.current
   LaunchedEffect(Unit){
-    eventBus.events.collect { event ->
-      Toast.makeText(context, event, Toast.LENGTH_LONG)
+    eventBus.events.filterIsInstance<AppEvent.Message>().collect { event ->
+      Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
     }
 
   }

@@ -7,6 +7,8 @@ import coil3.ImageLoader
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
+import com.picshare.app.ui.events.AppEvent
+import com.picshare.app.ui.events.EventBus
 import com.picshare.app.ui.theme.LikeButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +21,7 @@ import javax.inject.Inject
 class PostViewModel @Inject constructor(
   private val userRepository: UserRepository,
   private val postRepository: PostRepository,
+  private val eventBus: EventBus,
   val imageLoader: ImageLoader
 ): ViewModel(){
 
@@ -48,7 +51,11 @@ class PostViewModel @Inject constructor(
     _showDeleteDialog.value = false
     viewModelScope.launch {
       when (val result =  postRepository.delete(uiState.value.post!!.id)){
-        is NetworkResult.Success -> _uiState.update { it.copy( isDeleted = true ) }
+        is NetworkResult.Success -> {
+          eventBus.send(AppEvent.Message("Post deleted correctly"))
+          eventBus.send(AppEvent.PostDeleted(postId = uiState.value.post!!.id))
+          _uiState.update { it.copy(isDeleted = true) }
+        }
         is NetworkResult.Error -> Log.e(TAG, result.message)
       }
     }

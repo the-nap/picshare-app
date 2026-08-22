@@ -8,8 +8,8 @@ import javax.inject.Singleton
 @Singleton
 class EventBus @Inject constructor() {
 
-  private val _events = Channel<String>()
+  private val _events = Channel<AppEvent>()
   val events = _events.receiveAsFlow()
 
-  suspend fun send(toShow: String) = _events.send(toShow)
+  suspend fun send(event: AppEvent) = _events.send(event)
 }
