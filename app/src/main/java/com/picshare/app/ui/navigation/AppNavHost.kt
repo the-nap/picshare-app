@@ -36,14 +36,15 @@ fun AppNavHost(
     startDestination = Route.Feed,
     modifier = Modifier.padding(padding)
   ){
-      composable<Route.Feed> { FeedScreen(onNavigationEvent = navigationViewModel::onEvent) }
-      composable<Route.Search> { SearchScreen(onNavigationEvent = navigationViewModel::onEvent) }
-    composable<Route.Settings> { SettingsScreen()}
-      composable<Route.User> { backStackEntry ->
-        val route = backStackEntry.toRoute<Route.User>()
-        UserScreen(onNavigationEvent = navigationViewModel::onEvent, userId = route.userId) }
-      dialog<Route.Post> { backStackEntry ->
-        val route = backStackEntry.toRoute<Route.Post>()
-        PostScreen(postId = route.postId, onNavigationEvent = navigationViewModel::onEvent) }
+    composable<Route.Feed> { FeedScreen(onNavigationEvent = navigationViewModel::onEvent) }
+    composable<Route.Search> { SearchScreen(onNavigationEvent = navigationViewModel::onEvent) }
+    composable<Route.Settings> { SettingsScreen() }
+    composable<Route.Upload> { PostUploadScreen() }
+    composable<Route.User> { backStackEntry ->
+      val route = backStackEntry.toRoute<Route.User>()
+      UserScreen(onNavigationEvent = navigationViewModel::onEvent, userId = route.userId) }
+    dialog<Route.Post> { backStackEntry ->
+      val route = backStackEntry.toRoute<Route.Post>()
+      PostScreen(postId = route.postId, onNavigationEvent = navigationViewModel::onEvent) }
   }
 }

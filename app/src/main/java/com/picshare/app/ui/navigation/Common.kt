@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -28,9 +29,29 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.picshare.app.R
 import compose.icons.CssGgIcons
 import compose.icons.cssggicons.Image
+import compose.icons.cssggicons.MathPlus
 import compose.icons.cssggicons.Search
 import compose.icons.cssggicons.User
 
+@Composable
+fun UploadButton(
+  onNavigationEvent: (NavEvent) -> Unit
+){
+  IconButton(
+    onClick = {
+      onNavigationEvent(
+        NavEvent.OnNavigateTo(
+          Route.Upload
+        )
+      )
+    },
+  ) {
+    Icon(
+      imageVector = CssGgIcons.MathPlus,
+      contentDescription = null
+    )
+  }
+}
 @Composable
 fun NavigationFooter(
   navController: NavController
