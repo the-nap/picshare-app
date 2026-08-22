@@ -64,8 +64,8 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun providePostRepository(api: PicshareApi, gson: Gson): PostRepository {
-    return PostRepository(api, gson)
+  fun providePostRepository(api: PicshareApi, gson: Gson, @ApplicationContext context: Context): PostRepository {
+    return PostRepository(api, gson, context.contentResolver)
   }
 
   @Provides

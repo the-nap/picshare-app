@@ -100,7 +100,6 @@ class UserRepository (
     }
   }
 
-
   private fun uriToMultipart(uri: Uri): MultipartBody.Part {
     val inputStream = contentResolver.openInputStream(uri)
       ?: throw IOException("Unable to open input stream")
