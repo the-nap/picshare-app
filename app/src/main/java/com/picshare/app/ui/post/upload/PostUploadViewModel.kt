@@ -9,6 +9,7 @@ import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.model.PostModel
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
+import com.picshare.app.ui.events.AppEvent
 import com.picshare.app.ui.events.EventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,12 +112,12 @@ class PostUploadViewModel @Inject constructor(
       _uiState.update { it.copy(isLoading = true) }
       when(val result = postRepository.upload(state.uri!!, state.post)){
         is NetworkResult.Success -> {
-          eventBus.send("Post uploaded succesfully")
+          eventBus.send(AppEvent.Message("Post uploaded succesfully"))
           reset()
         }
         is NetworkResult.Error -> {
           Log.e(TAG, "error: ${result.message}")
-          eventBus.send("An error occurred, try again.")
+          eventBus.send(AppEvent.Message("An error occurred, try again."))
         }
       }
       _uiState.update { it.copy(isLoading = false) }

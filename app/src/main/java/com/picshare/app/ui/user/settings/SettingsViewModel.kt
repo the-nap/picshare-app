@@ -12,6 +12,7 @@ import com.picshare.app.BuildConfig
 import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.repository.UserRepository
+import com.picshare.app.ui.events.AppEvent
 import com.picshare.app.ui.events.EventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -79,7 +80,7 @@ class SettingsViewModel @Inject constructor(
       when(val result = userRepository.upload(state.newImageUri, state.newBio)){
         is NetworkResult.Success -> {
           userRepository.refreshCurrentUser(state.user!!.id)
-          eventBus.send("User updated correctly")
+          eventBus.send(AppEvent.Message("User updated correctly"))
         }
         is NetworkResult.Error -> Log.e(TAG, "error: ${result.message}")
       }
@@ -100,7 +101,7 @@ class SettingsViewModel @Inject constructor(
     viewModelScope.launch {
       when (val result =  userRepository.delete()){
         is NetworkResult.Success -> {
-          eventBus.send("User deleted correctly. Logging out...")
+          eventBus.send(AppEvent.Message("User deleted correctly. Logging out..."))
           authRepository.logout(context)
         }
         is NetworkResult.Error -> Log.e(TAG, result.message)
