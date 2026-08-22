@@ -81,7 +81,9 @@ fun Gallery (
     !state.error.isNullOrBlank() ->
       Text(
         text = state.error.toString(),
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp)
       )
 
     state.posts.isEmpty() ->
