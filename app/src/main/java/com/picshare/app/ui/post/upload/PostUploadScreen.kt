@@ -1,5 +1,6 @@
 package com.picshare.app.ui.post.upload
 
+import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -42,9 +44,15 @@ fun PostUploadScreen(
 
   val state by viewModel.uiState.collectAsState()
 
+  val context = LocalContext.current
   val pickImageLauncher = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.PickVisualMedia(),
-  ) { uri -> uri?.let { viewModel.updateFile(uri = it) }
+  ) { uri ->
+    uri?.let {
+      val size = context.contentResolver.query(it, arrayOf(OpenableColumns.SIZE), null, null, null)
+        ?.use { c -> if (c.moveToFirst()) c.getLong(0) else -1L } ?: -1L
+      viewModel.updateFile(it, size)
+    }
   }
 
   Column(
@@ -101,7 +109,7 @@ fun PostUploadScreen(
 
     val description = state.post.description
     OutlinedTextField(
-      value = "",
+      value = description,
       onValueChange = { if (it.length <= maxDescriptionLength) viewModel.onDescriptionChange(it) },
       label = { Text("Add a description to your post") },
       minLines = 5,
@@ -121,7 +129,7 @@ fun PostUploadScreen(
 
     val tags = state.post.tags
     OutlinedTextField(
-      value = "",
+      value = tags,
       onValueChange = { if (it.length <= maxTagsLength) viewModel.onTagsChange(it) },
       label = { Text("Add some tags to search your post") },
       minLines = 5,
@@ -131,7 +139,7 @@ fun PostUploadScreen(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-          Text("${description.length}/$maxDescriptionLength")
+          Text("${tags.length}/$maxTagsLength")
         }
       },
       modifier = Modifier.fillMaxWidth(),

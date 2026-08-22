@@ -23,16 +23,16 @@ import javax.inject.Inject
 @HiltViewModel
 class PostUploadViewModel @Inject constructor(
   private val postRepository: PostRepository,
-  private val userRepository: UserRepository,
+  userRepository: UserRepository,
   val imageLoader: ImageLoader
 ): ViewModel() {
 
   private val TAG = this.javaClass.simpleName
 
-  private val maxFileSize = 1000L * 1000 * 10
   private val tagsPattern = Regex("^[a-zA-Z\\s]+$")
+  private val maxSize: Long = 1000*1000*10
 
-  private val _uiState = MutableStateFlow(ImageUploadModel(
+  private val _uiState = MutableStateFlow(ImageUploadState(
     post = PostModel(
       id = "",
       userId = userRepository.currentUser.id,
@@ -51,34 +51,32 @@ class PostUploadViewModel @Inject constructor(
     .map{ it.isValid }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
-  fun updateFile(uri: Uri) {
-    _uiState.update { it.copy(uri = uri) }
+  fun updateFile(uri: Uri, size: Long) {
+    _uiState.update { it.copy(uri = uri, sizeBytes = size) }
   }
 
-  fun updateDescription(description: String) {
-    _uiState.update { it.copy(post = it.post.copy(description = description)) }
-  }
-
-  fun updateTags(tags: String) {
-    _uiState.update { it.copy(post = it.post.copy(tags = tags)) }
-  }
-
-  private fun validate(model: ImageUploadModel): UploadFormErrors {
+  private fun validate(state: ImageUploadState): UploadFormErrors {
     val fileError = when {
-      model.uri == null -> "Please upload an image"
+      state.uri == null -> "Please upload an image"
       else -> null
     }
 
-    val descriptionError = if (model.post.description.length > 140) {
+    val sizeError = if (state.sizeBytes >= maxSize){
+       "File is too big, max size is 10MB"
+    } else {
+      null
+    }
+
+    val descriptionError = if (state.post.description.length > 140) {
       "Max length is 140 characters"
     } else {
       null
     }
 
     val tagsError = when {
-      model.post.tags.isNotEmpty() && !tagsPattern.matches(model.post.tags) ->
+      state.post.tags.isNotEmpty() && !tagsPattern.matches(state.post.tags) ->
         "Only letters are allowed"
-      model.post.tags.length > 25 -> "Max length is 25 characters"
+      state.post.tags.length > 25 -> "Max length is 25 characters"
       else -> null
     }
 
@@ -98,10 +96,10 @@ class PostUploadViewModel @Inject constructor(
 
   fun onSubmit(){
     val state = uiState.value
-    if (state.uri == null) return
+    if (!isValid.value) return
     viewModelScope.launch{
       _uiState.update { it.copy(isLoading = true) }
-      when(val result = postRepository.upload(state.uri, state.post)){
+      when(val result = postRepository.upload(state.uri!!, state.post)){
         is NetworkResult.Success -> {}
         is NetworkResult.Error -> Log.e(TAG, "error: ${result.message}")
       }
