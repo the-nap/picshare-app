@@ -43,6 +43,7 @@ fun PostUploadScreen(
   val maxTagsLength = 25
 
   val state by viewModel.uiState.collectAsState()
+  val errors by viewModel.errorsState.collectAsState()
 
   val context = LocalContext.current
   val pickImageLauncher = rememberLauncherForActivityResult(
@@ -70,28 +71,40 @@ fun PostUploadScreen(
     )
     Spacer(Modifier.height(12.dp))
 
-    Column(
-      modifier = Modifier
-        .size(96.dp)
-        .background(MaterialTheme.colorScheme.surfaceVariant),
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-      val imageUri = viewModel.getImage()
-      if(imageUri != null)
-      AsyncImage(
-        imageLoader = imageLoader,
-        model = imageUri,
-        contentDescription = "Profile picture preview",
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxSize(),
-      )
-      else
+    val fileError = errors.file ?: errors.size
+    Column {
+      if (state.uri != null) {
+        Column(
+          modifier = Modifier
+            .size(96.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+          horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+          AsyncImage(
+            imageLoader = imageLoader,
+            model = state.uri,
+            contentDescription = "Profile picture preview",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+          )
+        }
+      } else {
         Text(
           text = "Upload an image to see it here",
           modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
         )
+      }
+      if (fileError != null) {
+        Text(
+          text = fileError,
+          color = MaterialTheme.colorScheme.error,
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+        )
+      }
     }
     Spacer(Modifier.height(12.dp))
 
@@ -105,20 +118,25 @@ fun PostUploadScreen(
 
     Spacer(Modifier.height(32.dp))
 
-// --- Bio ---
 
     val description = state.post.description
+    val descriptionError = errors.description
     OutlinedTextField(
       value = description,
       onValueChange = { if (it.length <= maxDescriptionLength) viewModel.onDescriptionChange(it) },
       label = { Text("Add a description to your post") },
       minLines = 5,
       maxLines = 10,
+      isError = descriptionError != null,
       supportingText = {
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
         ) {
+          Text(
+            text = descriptionError ?: "",
+            color = MaterialTheme.colorScheme.error
+          )
           Text("${description.length}/$maxDescriptionLength")
         }
       },
@@ -128,17 +146,23 @@ fun PostUploadScreen(
     Spacer(Modifier.height(16.dp))
 
     val tags = state.post.tags
+    val tagsError = errors.tags
     OutlinedTextField(
       value = tags,
       onValueChange = { if (it.length <= maxTagsLength) viewModel.onTagsChange(it) },
       label = { Text("Add some tags to search your post") },
-      minLines = 5,
-      maxLines = 10,
+      minLines = 2,
+      maxLines = 4,
+      isError = tagsError != null,
       supportingText = {
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
         ) {
+          Text(
+            text = tagsError ?: "",
+            color = MaterialTheme.colorScheme.error
+          )
           Text("${tags.length}/$maxTagsLength")
         }
       },

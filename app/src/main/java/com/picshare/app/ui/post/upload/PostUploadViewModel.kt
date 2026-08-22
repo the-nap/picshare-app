@@ -43,13 +43,13 @@ class PostUploadViewModel @Inject constructor(
   ))
   val uiState = _uiState.asStateFlow()
 
-  val formErrors: StateFlow<UploadFormErrors> = _uiState
-    .map{ validate(it) }
-    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UploadFormErrors())
+  val errorsState: StateFlow<UploadFormErrors> = uiState
+    .map { validate(it) }
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UploadFormErrors())
 
-  val isValid: StateFlow<Boolean> = formErrors
-    .map{ it.isValid }
-    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+  val isValid: StateFlow<Boolean> = errorsState
+    .map { it.isValid }
+    .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
   fun updateFile(uri: Uri, size: Long) {
     _uiState.update { it.copy(uri = uri, sizeBytes = size) }
@@ -83,12 +83,14 @@ class PostUploadViewModel @Inject constructor(
     return UploadFormErrors(
       file = fileError,
       description = descriptionError,
+      size = sizeError,
       tags = tagsError
     )
   }
 
   fun getImage(): Uri? {
     val state = uiState.value
+
     if(state.uri != null)
       return state.uri
     return null
@@ -96,13 +98,16 @@ class PostUploadViewModel @Inject constructor(
 
   fun onSubmit(){
     val state = uiState.value
+    Log.d(TAG, state.toString())
+    Log.d(TAG, isValid.value.toString())
     if (!isValid.value) return
     viewModelScope.launch{
       _uiState.update { it.copy(isLoading = true) }
       when(val result = postRepository.upload(state.uri!!, state.post)){
-        is NetworkResult.Success -> {}
+        is NetworkResult.Success -> Log.d(TAG, "All good")
         is NetworkResult.Error -> Log.e(TAG, "error: ${result.message}")
       }
+      Log.d(TAG, state.toString())
       _uiState.update { it.copy(isLoading = false) }
     }
   }
