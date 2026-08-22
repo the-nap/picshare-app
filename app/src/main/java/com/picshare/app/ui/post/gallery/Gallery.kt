@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
@@ -28,11 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import com.picshare.app.BuildConfig
+import com.picshare.app.R
 import com.picshare.app.ui.navigation.NavEvent
 import com.picshare.app.ui.navigation.Route
 
@@ -107,8 +110,7 @@ fun Gallery (
           AsyncImage(
             imageLoader = imageLoader,
             model = "${BuildConfig.PREVIEW_URL}/${post.id}",
-            placeholder = ColorPainter(Color.Cyan),
-            error = ColorPainter(Color.Red),
+            error = painterResource(R.drawable.default_image ),
             contentScale = ContentScale.Fit,
             contentDescription = null,
             onSuccess = { state ->

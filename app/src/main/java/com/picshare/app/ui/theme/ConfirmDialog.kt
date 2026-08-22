@@ -13,7 +13,6 @@ fun ConfirmDialog(
   onDismissRequest: () -> Unit,
   dialogTitle: String,
   dialogText: String,
-  onConfirmMessage: String,
 ){
   val context = LocalContext.current
   AlertDialog(
@@ -26,7 +25,6 @@ fun ConfirmDialog(
       TextButton(
         onClick = {
           onConfirmation()
-          Toast.makeText(context, onConfirmMessage, Toast.LENGTH_SHORT).show()
         }
       ){
         Text("Confirm")

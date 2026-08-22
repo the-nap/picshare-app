@@ -9,6 +9,7 @@ import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.model.PostModel
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
+import com.picshare.app.ui.events.EventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PostUploadViewModel @Inject constructor(
   private val postRepository: PostRepository,
-  userRepository: UserRepository,
+  private val userRepository: UserRepository,
+  private val eventBus: EventBus,
   val imageLoader: ImageLoader
 ): ViewModel() {
 
@@ -88,18 +90,35 @@ class PostUploadViewModel @Inject constructor(
     )
   }
 
+  private fun reset() {
+    _uiState.update {
+      it.copy(
+        uri = null,
+        post = PostModel(
+          id = "",
+          userId = userRepository.currentUser.id,
+          description = "",
+          tags = "",
+          likesNumber = 0
+        )
+      )
+    }
+  }
   fun onSubmit(){
     val state = uiState.value
-    Log.d(TAG, state.toString())
-    Log.d(TAG, isValid.value.toString())
     if (!isValid.value) return
     viewModelScope.launch{
       _uiState.update { it.copy(isLoading = true) }
       when(val result = postRepository.upload(state.uri!!, state.post)){
-        is NetworkResult.Success -> Log.d(TAG, "All good")
-        is NetworkResult.Error -> Log.e(TAG, "error: ${result.message}")
+        is NetworkResult.Success -> {
+          eventBus.send("Post uploaded succesfully")
+          reset()
+        }
+        is NetworkResult.Error -> {
+          Log.e(TAG, "error: ${result.message}")
+          eventBus.send("An error occurred, try again.")
+        }
       }
-      Log.d(TAG, state.toString())
       _uiState.update { it.copy(isLoading = false) }
     }
   }

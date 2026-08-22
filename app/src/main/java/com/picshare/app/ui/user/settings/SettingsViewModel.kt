@@ -12,6 +12,7 @@ import com.picshare.app.BuildConfig
 import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.repository.UserRepository
+import com.picshare.app.ui.events.EventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,7 @@ class SettingsViewModel @Inject constructor(
   val imageLoader: ImageLoader,
   private val userRepository: UserRepository,
   private val authRepository: AuthRepository,
+  private val eventBus: EventBus,
   @ApplicationContext private val context: Context
 ): ViewModel() {
   private val TAG = this.javaClass.simpleName
@@ -77,6 +79,7 @@ class SettingsViewModel @Inject constructor(
       when(val result = userRepository.upload(state.newImageUri, state.newBio)){
         is NetworkResult.Success -> {
           userRepository.refreshCurrentUser(state.user!!.id)
+          eventBus.send("User updated correctly")
         }
         is NetworkResult.Error -> Log.e(TAG, "error: ${result.message}")
       }
@@ -96,7 +99,10 @@ class SettingsViewModel @Inject constructor(
     _showDeleteDialog.value = false
     viewModelScope.launch {
       when (val result =  userRepository.delete()){
-        is NetworkResult.Success -> authRepository.logout(context)
+        is NetworkResult.Success -> {
+          eventBus.send("User deleted correctly. Logging out...")
+          authRepository.logout(context)
+        }
         is NetworkResult.Error -> Log.e(TAG, result.message)
       }
     }
