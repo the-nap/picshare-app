@@ -67,6 +67,11 @@ fun PostScreen(
   val buttonState by viewModel.buttonState.collectAsStateWithLifecycle()
   val dialogState by viewModel.showDeleteDialog.collectAsStateWithLifecycle()
 
+  LaunchedEffect(state.isDeleted){
+    if(state.isDeleted)
+      onNavigationEvent(NavEvent.OnBack)
+  }
+
   PostContent(
     username = state.user?.username,
     userId = state.user?.id,
@@ -76,12 +81,12 @@ fun PostScreen(
     tags = state.post?.tags,
     likeButton = buttonState,
     showDeleteButton = state.isOwned,
-    onDeleteClick = {viewModel.showDeleteDialog()},
+    onDeleteClick = { viewModel.showDeleteDialog() },
     imageLoader = imageLoader,
     onNavigationEvent = onNavigationEvent,
     showDeleteDialog = dialogState,
-    onConfirm = {viewModel.confirmDelete()},
-    onDismiss = {viewModel.hideDeleteDialog()}
+    onConfirm = { viewModel.confirmDelete() },
+    onDismiss = { viewModel.hideDeleteDialog() }
   )
 }
 @Composable
@@ -101,13 +106,13 @@ private fun PostContent(
   onConfirm: () -> Unit,
   onDismiss: () -> Unit
 ) {
+
   if(showDeleteDialog){
     ConfirmDialog(
       dialogTitle = "Delete post",
       dialogText = "This post and all its data will be lost",
       onConfirmation = onConfirm,
       onDismissRequest = onDismiss,
-      onConfirmMessage = "Post Deleted"
     )
   }
   Column(

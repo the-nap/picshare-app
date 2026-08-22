@@ -20,7 +20,7 @@ class NavigationViewModel @Inject constructor(): ViewModel() {
         onBackPressed = event.onBackPressed
       }
 
-      is NavEvent.OnBack -> onBackPressed()
+      is NavEvent.OnBack -> activityNavController.popBackStack()
       is NavEvent.OnNavigateTo -> activityNavController.navigate(event.destination)
       is NavEvent.OnNavigateToTab -> {
         activityNavController.navigate(event.destination){

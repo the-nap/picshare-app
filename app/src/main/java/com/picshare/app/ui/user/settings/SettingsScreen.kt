@@ -59,7 +59,6 @@ fun SettingsScreen(
       dialogText = "This user and all its data will be lost",
       onConfirmation = { viewModel.confirmDelete() },
       onDismissRequest = { viewModel.hideDeleteDialog() },
-      onConfirmMessage = "User Deleted"
     )
   }
   Column(
