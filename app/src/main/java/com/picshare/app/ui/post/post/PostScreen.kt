@@ -1,17 +1,21 @@
 package com.picshare.app.ui.post.post
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -32,12 +36,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.ImageLoader
 import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
 import com.picshare.app.ui.navigation.NavEvent
@@ -105,7 +111,8 @@ private fun PostContent(
     )
   }
   Column(
-    horizontalAlignment = Alignment.CenterHorizontally
+    horizontalAlignment = Alignment.CenterHorizontally,
+    modifier = Modifier.verticalScroll(rememberScrollState())
   ) {
     Card(
       modifier = Modifier
@@ -137,9 +144,20 @@ private fun PostContent(
         ) {
           SubcomposeAsyncImage(
             imageLoader = imageLoader,
-            model = avatarUrl ?: R.drawable.default_avatar,
+            model = ImageRequest.Builder(LocalContext.current)
+              .data(avatarUrl)
+              .memoryCacheKey(userId)
+              .diskCacheKey(userId)
+              .build(),
             contentDescription = "User avatar",
-            loading = {CircularProgressIndicator(modifier = Modifier.size(50.dp))},
+            loading = {CircularProgressIndicator(modifier = Modifier.size(10.dp))},
+            error = {
+              Image(
+                painter = painterResource(R.drawable.default_avatar ),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+              ) },
             modifier = Modifier
               .size(40.dp)
               .clip(CircleShape),
@@ -154,8 +172,9 @@ private fun PostContent(
         var aspectRatio by remember { mutableFloatStateOf(1f) }
         SubcomposeAsyncImage (
           imageLoader = imageLoader,
-          model = imageUrl ?: R.drawable.default_image,
-          loading = { CircularProgressIndicator(modifier = Modifier.size(50.dp)) },
+          model = imageUrl,
+          loading = { CircularProgressIndicator(modifier = Modifier.size(20.dp)) },
+          error = { painterResource(R.drawable.default_image) },
           onSuccess = { state ->
             val size = state.result.image
             aspectRatio = size.width.toFloat() / size.height.toFloat()

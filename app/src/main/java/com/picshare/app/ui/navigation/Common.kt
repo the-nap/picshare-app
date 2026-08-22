@@ -1,6 +1,7 @@
 package com.picshare.app.ui.navigation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,12 +35,14 @@ import compose.icons.cssggicons.User
 
 @Composable
 fun UploadButton(
-  onNavigationEvent: (NavEvent) -> Unit
+  onNavigationEvent: (NavEvent) -> Unit,
 ){
   IconButton(
+    modifier = Modifier
+      .background(MaterialTheme.colorScheme.surface),
     onClick = {
       onNavigationEvent(
-        NavEvent.OnNavigateTo(
+        NavEvent.OnNavigateToTab(
           Route.Upload
         )
       )

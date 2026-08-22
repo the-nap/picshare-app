@@ -88,14 +88,6 @@ class PostUploadViewModel @Inject constructor(
     )
   }
 
-  fun getImage(): Uri? {
-    val state = uiState.value
-
-    if(state.uri != null)
-      return state.uri
-    return null
-  }
-
   fun onSubmit(){
     val state = uiState.value
     Log.d(TAG, state.toString())
