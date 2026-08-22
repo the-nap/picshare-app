@@ -16,9 +16,3 @@ data class UploadFormErrors(
 ){
   val isValid: Boolean get() = file == null && description == null && tags == null
 }
-
-data class UploadFile(
-  val uri: Uri,
-  val sizeBytes: Long,
-  val displayName: String? = null
-)

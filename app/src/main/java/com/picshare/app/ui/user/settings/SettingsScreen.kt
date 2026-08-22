@@ -40,10 +40,11 @@ import com.picshare.app.ui.theme.ConfirmDialog
 @Composable
 fun SettingsScreen(
   modifier: Modifier = Modifier,
-  maxBioLength: Int = 140,
   viewModel: SettingsViewModel = hiltViewModel(),
   imageLoader: ImageLoader = viewModel.imageLoader
 ) {
+
+  val maxBioLength = 140
 
   val state by viewModel.uiState.collectAsState()
   val showDeleteDialog by viewModel.showDeleteDialog.collectAsState()

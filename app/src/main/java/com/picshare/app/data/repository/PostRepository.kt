@@ -43,8 +43,7 @@ class PostRepository(
   }
 
   suspend fun upload(uriImage: Uri, postModel: PostModel): NetworkResult<Unit> {
-    var imagePart: MultipartBody.Part? = null
-      imagePart = try {
+    val imagePart: MultipartBody.Part = try {
         uriToMultipart(uriImage)
       } catch (e: Exception) {
         Log.e(TAG, e.message, e)
