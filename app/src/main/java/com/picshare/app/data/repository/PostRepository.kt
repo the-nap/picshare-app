@@ -13,8 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okio.IOException
+import okio.BufferedSink
 
 class PostRepository(
   private val dataSource: PicshareApi,
@@ -42,9 +43,9 @@ class PostRepository(
     }
   }
 
-  suspend fun upload(uriImage: Uri, postModel: PostModel): NetworkResult<Unit> {
+  suspend fun upload(uriImage: Uri, size: Long, postModel: PostModel): NetworkResult<Unit> {
     val imagePart: MultipartBody.Part = try {
-        uriToMultipart(uriImage)
+        uriToMultipart(uriImage, size)
       } catch (e: Exception) {
         Log.e(TAG, e.message, e)
         return NetworkResult.Error("Failed to prepare image")
@@ -76,15 +77,19 @@ class PostRepository(
     }
   }
 
-  private fun uriToMultipart(uri: Uri): MultipartBody.Part {
-    val inputStream = contentResolver.openInputStream(uri)
-      ?: throw IOException("Unable to open input stream")
-
-    val bytes = inputStream.use { it.readBytes() }
+  private fun uriToMultipart(uri: Uri, size: Long): MultipartBody.Part {
     val mimeType = contentResolver.getType(uri) ?: "image/*"
     val fileName = "upload_${System.currentTimeMillis()}.jpg"
+    val requestBody = object : RequestBody() {
+      override fun contentType() = mimeType.toMediaTypeOrNull()
+      override fun contentLength() = size
+      override fun writeTo(sink: BufferedSink) {
+        contentResolver.openInputStream(uri)!!.use { input ->
+          input.copyTo(sink.outputStream())
+        }
+      }
 
-    val requestBody = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+    }
     return MultipartBody.Part.createFormData("data", fileName, requestBody)
   }
 

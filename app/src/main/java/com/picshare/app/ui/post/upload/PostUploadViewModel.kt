@@ -110,7 +110,7 @@ class PostUploadViewModel @Inject constructor(
     if (!isValid.value) return
     viewModelScope.launch{
       _uiState.update { it.copy(isLoading = true) }
-      when(val result = postRepository.upload(state.uri!!, state.post)){
+      when(val result = postRepository.upload(state.uri!!, state.sizeBytes, state.post)){
         is NetworkResult.Success -> {
           eventBus.send(AppEvent.Message("Post uploaded succesfully"))
           reset()

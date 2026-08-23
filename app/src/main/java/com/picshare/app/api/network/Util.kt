@@ -1,5 +1,6 @@
 package com.picshare.app.api.network
 
+import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -7,6 +8,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 object Util {
+  private val TAG = this.javaClass.simpleName
 
   suspend fun <T> handleRequest(
     dispatcher: CoroutineDispatcher,
@@ -16,6 +18,7 @@ object Util {
       try {
         NetworkResult.Success(apiCall.invoke())
       } catch (throwable: Throwable) {
+        Log.e(TAG, throwable.message, throwable)
         when (throwable) {
           is IOException -> NetworkResult.Error("Check your internet connection")
           is HttpException -> {
@@ -36,6 +39,7 @@ object Util {
         Gson().fromJson(it, ErrorResponse::class.java)
       }
     } catch (exception: Exception) {
+      Log.e(TAG, exception.message, exception)
       null
     }
   }

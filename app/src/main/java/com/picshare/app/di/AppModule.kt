@@ -20,6 +20,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -59,6 +60,7 @@ object AppModule {
           tokenProvider.getValidAccessToken()
         }
       }))
+      .writeTimeout(20, TimeUnit.SECONDS)
       .build()
   }
 
