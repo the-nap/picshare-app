@@ -110,7 +110,7 @@ fun SearchContent(
 
     when(searchType){
       SearchType.USERS -> UserList(username = query, onNavigationEvent = onNavigationEvent)
-      SearchType.TAGS -> Gallery(key = "tag", toSearch = query, onNavigationEvent = onNavigationEvent)
+      SearchType.TAGS -> Gallery(modifier = Modifier, key = "tag", toSearch = query, onNavigationEvent = onNavigationEvent)
     }
   }
 }

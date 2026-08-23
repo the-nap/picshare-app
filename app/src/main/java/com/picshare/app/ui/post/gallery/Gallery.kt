@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +43,7 @@ import com.picshare.app.ui.navigation.Route
 
 @Composable
 fun Gallery (
+  modifier: Modifier,
   viewModel: GalleryViewModel = hiltViewModel(),
   onNavigationEvent: (NavEvent) -> Unit,
   key: String = "feed",
@@ -75,7 +78,7 @@ fun Gallery (
   when {
     state.isLoading && state.posts.isEmpty() ->
       Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
       ) {
         CircularProgressIndicator()
