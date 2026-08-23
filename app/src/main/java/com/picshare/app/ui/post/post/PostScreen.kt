@@ -86,7 +86,7 @@ fun PostScreen(
     onNavigationEvent = onNavigationEvent,
     showDeleteDialog = dialogState,
     onConfirm = { viewModel.confirmDelete() },
-    onDismiss = { viewModel.hideDeleteDialog() }
+    onDismiss = { viewModel.hideDeleteDialog() },
   )
 }
 @Composable
@@ -117,7 +117,11 @@ private fun PostContent(
   }
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
-    modifier = Modifier.verticalScroll(rememberScrollState())
+    verticalArrangement = Arrangement.Center,
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(8.dp)
+      .verticalScroll(rememberScrollState())
   ) {
     Card(
       modifier = Modifier

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -34,7 +35,9 @@ fun AppNavHost(
     composable<Route.User> { backStackEntry ->
       val route = backStackEntry.toRoute<Route.User>()
       UserScreen(onNavigationEvent = navigationViewModel::onEvent, userId = route.userId) }
-    dialog<Route.Post> { backStackEntry ->
+    dialog<Route.Post>(
+      dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+    ) { backStackEntry ->
       val route = backStackEntry.toRoute<Route.Post>()
       PostScreen(postId = route.postId, onNavigationEvent = navigationViewModel::onEvent) }
   }
