@@ -4,9 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -14,6 +16,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -65,6 +69,41 @@ fun NavigationFooter(
   NavigationBar {
     Destination.entries.forEachIndexed { _, destination ->
       NavigationBarItem(
+        selected = currentDestination?.route == destination.route::class.qualifiedName,
+        onClick = {
+          onNavigationEvent(
+            NavEvent.OnNavigateTo(
+              destination.route
+            )
+          )
+        },
+        icon = { Icon(imageVector = destination.icon, contentDescription = null) },
+        label = { Text(destination.label) }
+      )
+    }
+  }
+}
+@Composable
+fun SideNavigation(
+  navController: NavController,
+  onNavigationEvent: (NavEvent) -> Unit
+) {
+
+  val navBackStackEntry by navController.currentBackStackEntryAsState()
+  val currentDestination = navBackStackEntry?.destination
+
+  NavigationRail(
+    header = {
+      Image(
+        painter = painterResource(R.drawable.logo_complete),
+        contentDescription = null
+      )
+    },
+    modifier = Modifier.width(64.dp),
+    windowInsets = WindowInsets(0)
+  ) {
+    Destination.entries.forEachIndexed { _, destination ->
+      NavigationRailItem(
         selected = currentDestination?.route == destination.route::class.qualifiedName,
         onClick = {
           onNavigationEvent(
