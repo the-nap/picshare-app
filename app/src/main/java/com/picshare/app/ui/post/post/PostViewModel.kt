@@ -86,6 +86,10 @@ class PostViewModel @Inject constructor(
 
   }
   fun load(postId: String) {
+    val state = _uiState.value
+    if(state.post?.id == postId){
+      return
+    }
     viewModelScope.launch {
       _buttonState.update { it.copy(isLoading = true) }
       when (val result = postRepository.isLiked(postId)) {

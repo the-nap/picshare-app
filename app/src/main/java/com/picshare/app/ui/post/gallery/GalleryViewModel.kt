@@ -65,6 +65,13 @@ class GalleryViewModel @Inject constructor (
 
   fun set(key: String, toSearch: String){
     Log.d(TAG, "set: key='$key', toSearch='$toSearch'")
+    val state = _uiState.value
+
+    if(state.key == key && state.toSearch == toSearch && state.posts.isNotEmpty()){
+      Log.d(TAG,"Already loaded, skipping")
+      return
+    }
+
 
     if((key != "feed") && (toSearch.isEmpty())){
       Log.d(TAG, "Nothing to search, skipping")
@@ -83,7 +90,7 @@ class GalleryViewModel @Inject constructor (
 
   fun getNext(){
     val state = _uiState.value
-    if(state.isLoading || state.hasMore)
+    if(state.isLoading || !state.hasMore)
       return
     request.tryEmit(
       PostBatchRequest(

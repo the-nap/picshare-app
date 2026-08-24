@@ -54,6 +54,8 @@ class UserListViewModel @Inject constructor(
     if (username.isEmpty()) {
       return
     }
+    if(username == _uiState.value.username)
+      return
     Log.d(TAG, "Set: $username")
     request.tryEmit(
       UserListRequest(
