@@ -25,15 +25,19 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
 import com.picshare.app.BuildConfig
+import com.picshare.app.R
 import com.picshare.app.data.model.UserModel
 import com.picshare.app.ui.navigation.NavEvent
 import com.picshare.app.ui.navigation.Route
@@ -116,10 +120,14 @@ fun UserListItem(
   ) {
     AsyncImage(
       imageLoader = imageLoader,
-      model = "${BuildConfig.AVATAR_URL}/${user.id}",
-      placeholder = ColorPainter(MaterialTheme.colorScheme.surfaceVariant),
-      error = ColorPainter(MaterialTheme.colorScheme.errorContainer),
-      contentScale = ContentScale.Fit,
+      model = ImageRequest.Builder(LocalContext.current)
+        .data("${BuildConfig.AVATAR_URL}/${user.id}")
+        .memoryCachePolicy(CachePolicy.DISABLED)
+        .diskCachePolicy(CachePolicy.DISABLED)
+        .build(),
+      placeholder = painterResource(R.drawable.default_avatar),
+      error = painterResource(R.drawable.default_avatar),
+      contentScale = ContentScale.Crop,
       contentDescription = "${user.username}'s avatar",
       modifier = Modifier
         .size(48.dp)

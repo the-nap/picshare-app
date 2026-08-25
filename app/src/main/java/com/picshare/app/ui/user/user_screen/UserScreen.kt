@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.memory.MemoryCache
+import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import com.picshare.app.BuildConfig
 import com.picshare.app.R
@@ -158,7 +160,7 @@ fun UserScreen(
                 verticalAlignment = Alignment.CenterVertically
               ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                  StatItem(label = "Followers", count = user.followersCount)
+                  StatItem(label = "Followers", count = state.followersNumber)
                   StatItem(label = "Followed", count = user.followedCount)
                 }
                 val button by viewModel.buttonState.collectAsState()
@@ -210,8 +212,8 @@ fun ProfileAvatar(
   AsyncImage(
     model = ImageRequest.Builder(LocalContext.current)
       .data("${BuildConfig.AVATAR_URL}/${user.id}")
-      .memoryCacheKey(user.id)
-      .diskCacheKey(user.id)
+      .memoryCachePolicy(CachePolicy.DISABLED)
+      .diskCachePolicy(CachePolicy.DISABLED)
       .build(),
     contentDescription = "${user.username}'s profile picture",
     placeholder = painterResource(R.drawable.default_avatar),

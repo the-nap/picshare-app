@@ -69,7 +69,7 @@ class UserViewModel @Inject constructor(
       when (val result = userDeferred.await()) {
         is NetworkResult.Success -> {
           Log.d(TAG, "fetchUser: Successfully fetched user: ${result.data}")
-          _uiState.update { it.copy(user = result.data, isMe = false) }
+          _uiState.update { it.copy(user = result.data, isMe = false, followersNumber = result.data.followersCount) }
         }
         is NetworkResult.Error -> {
           Log.e(TAG, "fetchUser: Error fetching user: ${result.message}")
@@ -107,7 +107,7 @@ class UserViewModel @Inject constructor(
       when (val result = userRepository.follow(user.id)){
         is NetworkResult.Success -> {
           Log.d(TAG, "follow: Successfully followed user ${user.id}")
-          _uiState.update { it.copy(isFollowed = true) }
+          _uiState.update { it.copy(isFollowed = true, followersNumber = it.followersNumber.toInt() + 1) }
           _buttonState.update { it.copy(text = "Unfollow") }
         }
         is NetworkResult.Error -> Log.e(TAG, "follow: Error following user ${user.id}: ${result.message}")
@@ -123,7 +123,7 @@ class UserViewModel @Inject constructor(
       when (val result = userRepository.unfollow(user.id)){
         is NetworkResult.Success -> {
           Log.d(TAG, "unfollow: Successfully unfollowed user ${user.id}")
-          _uiState.update { it.copy(isFollowed = false) }
+          _uiState.update { it.copy(isFollowed = false, followersNumber = it.followersNumber.toInt() - 1) }
           _buttonState.update { it.copy(text = "Follow") }
         }
         is NetworkResult.Error -> Log.e(TAG, "unfollow: Error unfollowing user ${user.id}: ${result.message}")
