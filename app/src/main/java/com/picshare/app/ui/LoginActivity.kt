@@ -1,6 +1,8 @@
 package com.picshare.app.ui
 
 import android.content.Intent
+import android.net.http.NetworkException
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -8,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -51,13 +54,17 @@ import com.picshare.app.api.auth.TokenProvider
 import com.picshare.app.ui.theme.PicshareTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import okio.FileNotFoundException
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
   private val TAG: String? = LoginActivity::class.simpleName
+  private var isLoggingIn by mutableStateOf(false)
+
   @Inject
   lateinit var authRepository: AuthRepository
+
   @Inject
   lateinit var tokenProvider: TokenProvider
 
@@ -65,7 +72,7 @@ class LoginActivity : ComponentActivity() {
     ActivityResultContracts.StartActivityForResult()
   ) { result ->
     lifecycleScope.launch {
-      try{
+      try {
         Log.d(TAG, "resultCode=${result.resultCode}")
         Log.d(TAG, "data=${result.data}")
         Log.d(TAG, "data?.data(uri)=${result.data?.data}")
@@ -76,13 +83,15 @@ class LoginActivity : ComponentActivity() {
           return@launch
         }
         val success = authRepository.handleAuthResponse(result.data)
-        if(success)
+        if (success)
           goToMainActivity()
         else {
           Log.e(TAG, "OAuth authentication failed")
         }
-      } catch(e: Exception){
+      } catch (e: Exception) {
         Log.e(TAG, "Error in authLauncher()", e)
+      } finally {
+        isLoggingIn = false;
       }
     }
   }
@@ -123,31 +132,40 @@ class LoginActivity : ComponentActivity() {
     }
   }
 
-  fun goToMainActivity(){
+  fun goToMainActivity() {
     Log.d(TAG, "Going to Main Activity")
     startActivity(Intent(this, MainActivity::class.java))
-    Log.d(TAG, "Main Activity started")
     finish()
   }
 
   private fun startLogin() {
+    isLoggingIn = true
     lifecycleScope.launch {
       try {
         Log.d(TAG, "AuthLauncher: $authLauncher")
         authLauncher.launch(authRepository.getAuthorizationRequest())
         Log.d(TAG, "AuthLauncher: All good")
+      } catch (e: IllegalStateException) {
+        Log.e(TAG, "Network Error()", e)
+        Toast.makeText(
+          this@LoginActivity,
+          "Network error, server is probably offline",
+          Toast.LENGTH_LONG
+        )
+          .show()
+        isLoggingIn = false
       } catch (e: Exception) {
         Log.e(TAG, "Error in startLogin()", e)
         Toast.makeText(
           this@LoginActivity,
           "An error occurred while starting login",
-          Toast.LENGTH_LONG)
+          Toast.LENGTH_LONG
+        )
           .show()
+        isLoggingIn = false
       }
     }
   }
-
-
 
   @Composable
   fun LoginScreen() {
@@ -203,19 +221,21 @@ class LoginActivity : ComponentActivity() {
       ) {
         Text(text = "Get started by signing in to your account")
         Spacer(Modifier.height(24.dp))
-        AccessButton {
-          startLogin()
-        }
+        AccessButton (
+          onClick = { startLogin() },
+        )
       }
     }
 
   }
+
   @Composable
   fun AccessButton(
-    onClick: () -> Unit
+    onClick: () -> Unit,
   ) {
     Button(
       onClick = onClick,
+      enabled = !isLoggingIn,
       modifier = Modifier
         .fillMaxWidth()
         .height(64.dp)
@@ -235,19 +255,16 @@ class LoginActivity : ComponentActivity() {
         vertical = 18.dp
       )
     ) {
-      Text(
-        text = "LOG IN",
-        fontSize = 19.sp,
-        fontWeight = FontWeight.SemiBold,
-        letterSpacing = 0.08.em
-      )
-    }
-  }
-  @Preview(showBackground = true)
-  @Composable
-  fun LoginScreenPreview() {
-    PicshareTheme {
-      LoginScreen()
+      if(isLoggingIn){
+        CircularProgressIndicator()
+      }else {
+        Text(
+          text = "LOG IN",
+          fontSize = 19.sp,
+          fontWeight = FontWeight.SemiBold,
+          letterSpacing = 0.08.em
+        )
+      }
     }
   }
 }

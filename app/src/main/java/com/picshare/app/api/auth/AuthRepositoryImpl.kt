@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.http.NetworkException
 import android.util.Log
 import androidx.core.net.toUri
 import com.picshare.app.BuildConfig
@@ -21,6 +22,7 @@ import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.EndSessionRequest
 import net.openid.appauth.ResponseTypeValues
+import java.io.FileNotFoundException
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -35,7 +37,16 @@ class AuthRepositoryImpl @Inject constructor(
   private val TAG = this.javaClass.simpleName
 
   override suspend fun getAuthorizationRequest(): Intent {
-    val serviceConfig = discoverEndpoints()
+    var serviceConfig: AuthorizationServiceConfiguration;
+    try{
+      serviceConfig = discoverEndpoints()
+    } catch (e: AuthorizationException) {
+      if (e.type == AuthorizationException.TYPE_GENERAL_ERROR &&
+        e.code == AuthorizationException.GeneralErrors.NETWORK_ERROR.code) {
+        throw IllegalStateException(e)
+      }
+      throw e
+    }
     val authRequest = createAuthRequest(serviceConfig)
     Log.d("AuthRepo", "AuthRequest: $authRequest")
 
