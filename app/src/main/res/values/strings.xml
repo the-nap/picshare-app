@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Picshare</string>
     <string name="title_activity_login">LoginActivity</string>
-    <string name="authServerUri">https://idp.example.com</string>
-    <string name="title_activity_feed">FeedActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

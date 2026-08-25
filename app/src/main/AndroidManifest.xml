@@ -17,14 +17,12 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_feed"
             android:theme="@style/Theme.Picshare"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
             android:name=".ui.LoginActivity"
             android:exported="true"
-            android:label="@string/title_activity_login"
             android:theme="@style/Theme.Picshare"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
