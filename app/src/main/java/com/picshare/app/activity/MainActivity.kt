@@ -1,4 +1,4 @@
-package com.picshare.app
+package com.picshare.app.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-  @Inject lateinit var eventBus: EventBus
+  @Inject
+  lateinit var eventBus: EventBus
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()

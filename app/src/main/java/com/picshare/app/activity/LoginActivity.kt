@@ -1,8 +1,6 @@
-package com.picshare.app.ui
+package com.picshare.app.activity
 
 import android.content.Intent
-import android.net.http.NetworkException
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -10,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -42,19 +39,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
-import com.picshare.app.MainActivity
 import com.picshare.app.R
 import com.picshare.app.api.auth.AuthRepository
 import com.picshare.app.api.auth.TokenProvider
 import com.picshare.app.ui.theme.PicshareTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import okio.FileNotFoundException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -91,7 +85,7 @@ class LoginActivity : ComponentActivity() {
       } catch (e: Exception) {
         Log.e(TAG, "Error in authLauncher()", e)
       } finally {
-        isLoggingIn = false;
+        isLoggingIn = false
       }
     }
   }
@@ -221,7 +215,7 @@ class LoginActivity : ComponentActivity() {
       ) {
         Text(text = "Get started by signing in to your account")
         Spacer(Modifier.height(24.dp))
-        AccessButton (
+        AccessButton(
           onClick = { startLogin() },
         )
       }
@@ -255,9 +249,9 @@ class LoginActivity : ComponentActivity() {
         vertical = 18.dp
       )
     ) {
-      if(isLoggingIn){
+      if (isLoggingIn) {
         CircularProgressIndicator()
-      }else {
+      } else {
         Text(
           text = "LOG IN",
           fontSize = 19.sp,

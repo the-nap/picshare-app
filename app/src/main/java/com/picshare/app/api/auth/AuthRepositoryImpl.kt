@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.http.NetworkException
 import android.util.Log
 import androidx.core.net.toUri
 import com.picshare.app.BuildConfig
@@ -12,7 +11,7 @@ import com.picshare.app.BuildConfig.CLIENT_ID
 import com.picshare.app.BuildConfig.REDIRECT_URI
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.repository.UserRepository
-import com.picshare.app.ui.LoginActivity
+import com.picshare.app.activity.LoginActivity
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
@@ -22,7 +21,6 @@ import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.EndSessionRequest
 import net.openid.appauth.ResponseTypeValues
-import java.io.FileNotFoundException
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -37,7 +35,7 @@ class AuthRepositoryImpl @Inject constructor(
   private val TAG = this.javaClass.simpleName
 
   override suspend fun getAuthorizationRequest(): Intent {
-    var serviceConfig: AuthorizationServiceConfiguration;
+    var serviceConfig: AuthorizationServiceConfiguration
     try{
       serviceConfig = discoverEndpoints()
     } catch (e: AuthorizationException) {
@@ -95,7 +93,7 @@ class AuthRepositoryImpl @Inject constructor(
   }
 
   override suspend fun tryRestoreSession(): Boolean {
-    val token = tokenProvider.getValidAccessToken() ?: return false
+    tokenProvider.getValidAccessToken() ?: return false
     val authState = TokenStorage.load(appContext) ?: return false
     val userId = extractUserId(authState)
     val result = userRepository.refreshCurrentUser(userId)

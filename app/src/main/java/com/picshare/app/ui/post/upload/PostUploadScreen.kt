@@ -68,7 +68,7 @@ fun PostUploadScreen(
   ) {
 
     Text(
-      text = "Profile Picture",
+      text = "Post something",
       style = MaterialTheme.typography.titleMedium,
       fontWeight = FontWeight.Bold,
     )

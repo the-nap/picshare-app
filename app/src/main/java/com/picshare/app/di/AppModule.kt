@@ -60,7 +60,9 @@ object AppModule {
           tokenProvider.getValidAccessToken()
         }
       }))
-      .writeTimeout(20, TimeUnit.SECONDS)
+      .connectTimeout(30, TimeUnit.SECONDS)
+      .writeTimeout(120, TimeUnit.SECONDS)
+      .readTimeout(60, TimeUnit.SECONDS)
       .build()
   }
 
