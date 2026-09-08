@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
 import com.picshare.app.api.network.Util
+import com.picshare.app.context_awareness.ShakeDetector
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.ui.events.AppEvent
 import com.picshare.app.ui.events.EventBus
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class GalleryViewModel @Inject constructor (
   private val repository: PostRepository,
   private val eventBus: EventBus,
+  private val shakeSensor: ShakeDetector,
   val imageLoader: ImageLoader
 ): ViewModel() {
 
@@ -36,6 +38,10 @@ class GalleryViewModel @Inject constructor (
   private val request = MutableSharedFlow<PostBatchRequest>(extraBufferCapacity = 1)
 
   init {
+    shakeSensor.startListening()
+    shakeSensor.setOnShakeListener {
+      reload()
+    }
     viewModelScope.launch{
       eventBus.events.filterIsInstance<AppEvent.PostDeleted>().collect{ event ->
        _uiState.update { state ->
@@ -63,6 +69,10 @@ class GalleryViewModel @Inject constructor (
     }
   }
 
+  override fun onCleared() {
+    shakeSensor.stopListening()
+  }
+
   fun set(key: String, toSearch: String){
     Log.d(TAG, "set: key='$key', toSearch='$toSearch'")
     val state = _uiState.value
@@ -82,6 +92,18 @@ class GalleryViewModel @Inject constructor (
       PostBatchRequest(
         key = key,
         toSearch = toSearch,
+        offset = 0,
+        resetFlag = true
+      )
+    )
+  }
+
+  fun reload() {
+    val state = _uiState.value
+    request.tryEmit(
+      PostBatchRequest(
+        key = state.key,
+        toSearch = state.toSearch,
         offset = 0,
         resetFlag = true
       )
