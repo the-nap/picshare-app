@@ -78,17 +78,16 @@ class PostUploadViewModel @Inject constructor(
         when (status) {
           is UploadStatus.Success -> {
             eventBus.send(AppEvent.Message("Post uploaded succesfully"))
-            UploadStatusBus.update(UploadStatus.Idle)
             reset()
         }
           is UploadStatus.Error -> {
             eventBus.send(AppEvent.Message("Post upload failed"))
-            UploadStatusBus.update(UploadStatus.Idle)
             reset()
           }
           else -> {}
         }
       }
+      UploadStatusBus.update(UploadStatus.Idle)
     }
   }
   fun fetchLocation(){
