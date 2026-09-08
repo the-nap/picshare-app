@@ -1,7 +1,6 @@
 package com.picshare.app.context_awareness
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -41,7 +40,7 @@ abstract class AndroidSensor(
     if(!doesSensorExist || !::sensorManager.isInitialized)
       return
     if(event?.sensor?.type == sensorType){
-      onSensorValuesChanged?.invoke(event.values.toList());
+      onSensorValuesChanged?.invoke(event.values.toList())
     }
   }
 

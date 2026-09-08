@@ -2,11 +2,12 @@ package com.picshare.app.context_awareness
 
 import android.content.Context
 import android.hardware.SensorManager
+import android.util.Log
 import kotlin.math.sqrt
 
 class ShakeDetector(
   private val context: Context,
-  private val shakeThreshold: Float = 12f, // m/s², tune this
+  private val shakeThreshold: Float = 36f, // m/s², tune this
   private val shakeSlopTimeMs: Long = 500  // min time between shakes
 ) {
   private val shakeSensor = ShakeSensors(context)
@@ -30,6 +31,7 @@ class ShakeDetector(
       val gForce = sqrt(gX * gX + gY * gY + gZ * gZ)
 
       if (gForce > shakeThreshold / SensorManager.GRAVITY_EARTH) {
+        Log.d("ShakeDetector", "gForce: $gForce")
         val now = System.currentTimeMillis()
         if (now - lastShakeTime > shakeSlopTimeMs) {
           lastShakeTime = now
