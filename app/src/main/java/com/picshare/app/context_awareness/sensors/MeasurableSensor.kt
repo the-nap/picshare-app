@@ -1,4 +1,4 @@
-package com.picshare.app.context_awareness
+package com.picshare.app.context_awareness.sensors
 
 abstract class MeasurableSensor (
   protected val sensorType: Int

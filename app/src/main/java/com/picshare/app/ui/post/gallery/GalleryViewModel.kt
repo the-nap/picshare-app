@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
 import com.picshare.app.api.network.Util
-import com.picshare.app.context_awareness.ShakeDetector
+import com.picshare.app.context_awareness.sensors.shake.ShakeDetector
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.ui.events.AppEvent
 import com.picshare.app.ui.events.EventBus

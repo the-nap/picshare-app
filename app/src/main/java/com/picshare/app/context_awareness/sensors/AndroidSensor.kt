@@ -1,4 +1,4 @@
-package com.picshare.app.context_awareness
+package com.picshare.app.context_awareness.sensors
 
 import android.content.Context
 import android.hardware.Sensor

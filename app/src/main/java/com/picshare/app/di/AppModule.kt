@@ -9,7 +9,7 @@ import com.picshare.app.BuildConfig
 import com.picshare.app.api.network.PicshareApi
 import com.picshare.app.api.auth.AuthInterceptor
 import com.picshare.app.api.auth.TokenProvider
-import com.picshare.app.context_awareness.ShakeDetector
+import com.picshare.app.context_awareness.sensors.shake.ShakeDetector
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
 import dagger.Module

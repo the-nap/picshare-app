@@ -1,8 +1,9 @@
-package com.picshare.app.context_awareness
+package com.picshare.app.context_awareness.sensors.shake
 
 import android.content.Context
 import android.hardware.SensorManager
 import android.util.Log
+import com.picshare.app.context_awareness.sensors.ShakeSensors
 import kotlin.math.sqrt
 
 class ShakeDetector(
