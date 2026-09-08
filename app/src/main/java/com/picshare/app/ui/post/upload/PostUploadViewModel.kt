@@ -1,6 +1,7 @@
 package com.picshare.app.ui.post.upload
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -71,9 +73,30 @@ class PostUploadViewModel @Inject constructor(
     if(granted) fetchLocation()
   }
 
+  init{
+    viewModelScope.launch {
+      UploadStatusBus.status.collect{
+        status ->
+        _uiState.update {
+          it.copy(isLoading = status is UploadStatus.InProgress)
+        }
+        when (status) {
+          is UploadStatus.Success -> {
+            eventBus.send(AppEvent.Message("Post uploaded succesfully"))
+            UploadStatusBus.update(UploadStatus.Idle)
+        }
+          is UploadStatus.Error -> {
+            eventBus.send(AppEvent.Message("Post upload failed"))
+            UploadStatusBus.update(UploadStatus.Idle)
+          }
+          else -> {}
+        }
+      }
+    }
+  }
   fun fetchLocation(){
     viewModelScope.launch {
-      _address.value = LocationManager.fetchLocation(appContext, fusedLocationClient)
+      _address.value = LocationManager.fetchLocation(fusedLocationClient)
       if(address.value != null)
         onTagsChange(address.value!!)
     }
@@ -129,19 +152,12 @@ class PostUploadViewModel @Inject constructor(
   fun onSubmit(){
     val state = uiState.value
     if (!isValid.value) return
-    viewModelScope.launch{
-      _uiState.update { it.copy(isLoading = true) }
-      when(val result = postRepository.upload(state.uri!!, state.sizeBytes, state.post)){
-        is NetworkResult.Success -> {
-          eventBus.send(AppEvent.Message("Post uploaded succesfully"))
-          reset()
-        }
-        is NetworkResult.Error -> {
-          Log.e(TAG, "error: ${result.message}")
-          eventBus.send(AppEvent.Message("An error occurred, try again."))
-        }
-      }
-      _uiState.update { it.copy(isLoading = false) }
+    Intent(appContext, UploadService::class.java).also {
+      it.putExtra("uri", state.uri)
+      it.putExtra("sizeBytes", state.sizeBytes)
+      it.putExtra("post", state.post)
+      it.action = UploadService.Actions.UPLOAD.toString()
+      appContext.startForegroundService(it)
     }
   }
 
