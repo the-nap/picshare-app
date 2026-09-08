@@ -1,17 +1,21 @@
 package com.picshare.app.ui.post.upload
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.picshare.app.api.network.Util.NetworkResult
+import com.picshare.app.context_awareness.location.LocationManager
 import com.picshare.app.data.model.PostModel
 import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
 import com.picshare.app.ui.events.AppEvent
 import com.picshare.app.ui.events.EventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +28,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostUploadViewModel @Inject constructor(
+  @ApplicationContext private val appContext: Context,
+  private val fusedLocationClient: FusedLocationProviderClient,
   private val postRepository: PostRepository,
   private val userRepository: UserRepository,
   private val eventBus: EventBus,
@@ -46,6 +52,9 @@ class PostUploadViewModel @Inject constructor(
   ))
   val uiState = _uiState.asStateFlow()
 
+  private val _address = MutableStateFlow<String?>(null)
+  val address: StateFlow<String?> = _address.asStateFlow()
+
   val errorsState: StateFlow<UploadFormErrors> = uiState
     .map { validate(it) }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UploadFormErrors())
@@ -58,6 +67,17 @@ class PostUploadViewModel @Inject constructor(
     _uiState.update { it.copy(uri = uri, sizeBytes = size) }
   }
 
+  fun onLocationPermissionResult(granted: Boolean){
+    if(granted) fetchLocation()
+  }
+
+  fun fetchLocation(){
+    viewModelScope.launch {
+      _address.value = LocationManager.fetchLocation(appContext, fusedLocationClient)
+      if(address.value != null)
+        onTagsChange(address.value!!)
+    }
+  }
   private fun validate(state: ImageUploadState): UploadFormErrors {
     val fileError = when {
       state.uri == null -> "Please upload an image"
@@ -105,6 +125,7 @@ class PostUploadViewModel @Inject constructor(
       )
     }
   }
+
   fun onSubmit(){
     val state = uiState.value
     if (!isValid.value) return

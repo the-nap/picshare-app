@@ -23,17 +23,25 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import com.google.android.gms.location.LocationServices
+import com.picshare.app.context_awareness.location.LocationManager.fetchLocation
 
 @Composable
 fun PostUploadScreen(
@@ -41,13 +49,15 @@ fun PostUploadScreen(
   imageLoader: ImageLoader = viewModel.imageLoader
 ) {
 
+  val context = LocalContext.current
+
   val maxDescriptionLength = 140
   val maxTagsLength = 25
 
   val state by viewModel.uiState.collectAsState()
   val errors by viewModel.errorsState.collectAsState()
+  val address by viewModel.address.collectAsState()
 
-  val context = LocalContext.current
   val pickImageLauncher = rememberLauncherForActivityResult(
     contract = ActivityResultContracts.PickVisualMedia(),
   ) { uri ->
@@ -55,6 +65,19 @@ fun PostUploadScreen(
       val size = context.contentResolver.query(it, arrayOf(OpenableColumns.SIZE), null, null, null)
         ?.use { c -> if (c.moveToFirst()) c.getLong(0) else -1L } ?: -1L
       viewModel.updateFile(it, size)
+    }
+  }
+
+  val locationPermissionLauncher = rememberLauncherForActivityResult(
+    ActivityResultContracts.RequestPermission()
+  ) { isGranted ->
+    viewModel.onLocationPermissionResult(isGranted)
+      }
+
+  LaunchedEffect(Unit) {
+    when (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+      PermissionChecker.PERMISSION_GRANTED -> viewModel.fetchLocation()
+      else -> locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
     }
   }
 

@@ -4,6 +4,8 @@ import android.content.Context
 import coil3.ImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.picshare.app.BuildConfig
 import com.picshare.app.api.network.PicshareApi
@@ -27,6 +29,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+  @Provides
+  @Singleton
+  fun provideLocationClient(@ApplicationContext context: Context): FusedLocationProviderClient =
+    LocationServices.getFusedLocationProviderClient(context)
 
   @Provides
   @Singleton
