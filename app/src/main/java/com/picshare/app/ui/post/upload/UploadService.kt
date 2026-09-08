@@ -16,8 +16,6 @@ import com.picshare.app.R
 import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.data.model.PostModel
 import com.picshare.app.data.repository.PostRepository
-import com.picshare.app.ui.events.AppEvent
-import com.picshare.app.ui.events.EventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope

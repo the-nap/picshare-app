@@ -3,15 +3,12 @@ package com.picshare.app.ui.post.upload
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.ImageLoader
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.picshare.app.api.network.Util.NetworkResult
 import com.picshare.app.context_awareness.location.LocationManager
 import com.picshare.app.data.model.PostModel
-import com.picshare.app.data.repository.PostRepository
 import com.picshare.app.data.repository.UserRepository
 import com.picshare.app.ui.events.AppEvent
 import com.picshare.app.ui.events.EventBus
@@ -21,7 +18,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -32,7 +28,6 @@ import javax.inject.Inject
 class PostUploadViewModel @Inject constructor(
   @ApplicationContext private val appContext: Context,
   private val fusedLocationClient: FusedLocationProviderClient,
-  private val postRepository: PostRepository,
   private val userRepository: UserRepository,
   private val eventBus: EventBus,
   val imageLoader: ImageLoader
@@ -84,10 +79,12 @@ class PostUploadViewModel @Inject constructor(
           is UploadStatus.Success -> {
             eventBus.send(AppEvent.Message("Post uploaded succesfully"))
             UploadStatusBus.update(UploadStatus.Idle)
+            reset()
         }
           is UploadStatus.Error -> {
             eventBus.send(AppEvent.Message("Post upload failed"))
             UploadStatusBus.update(UploadStatus.Idle)
+            reset()
           }
           else -> {}
         }
