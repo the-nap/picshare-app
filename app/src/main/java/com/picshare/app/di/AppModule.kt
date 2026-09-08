@@ -31,7 +31,7 @@ object AppModule {
   @Provides
   @Singleton
   fun provideShakeDetector(@ApplicationContext context: Context): ShakeDetector =
-    ShakeDetector(context);
+    ShakeDetector(context)
 
   @Provides
   @Singleton

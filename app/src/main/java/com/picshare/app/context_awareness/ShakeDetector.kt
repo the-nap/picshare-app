@@ -6,7 +6,7 @@ import android.util.Log
 import kotlin.math.sqrt
 
 class ShakeDetector(
-  private val context: Context,
+  context: Context,
   private val shakeThreshold: Float = 36f, // m/s², tune this
   private val shakeSlopTimeMs: Long = 500  // min time between shakes
 ) {
