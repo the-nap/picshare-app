@@ -21,6 +21,8 @@ navigation = "2.9.8"
 serialization = "2.4.10"
 composeIcons = "1.1.1"
 hiltNavigationCompose = "1.4.0"
+location = "21.0.1"
+maps = "18.1.0"
 
 [libraries]
 composeIcons-cssGg = { module = "br.com.devsrsouza.compose.icons:css-gg", version.ref = "composeIcons" }
@@ -30,12 +32,15 @@ androidx-security = { group = "androidx.security", name = "security-crypto", ver
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 gson-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson-converter" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "compose" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose-core", version.ref = "coil" }
 coil-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "location" }
+maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "maps" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
